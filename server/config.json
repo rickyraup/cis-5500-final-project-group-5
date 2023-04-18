@@ -1,0 +1,9 @@
+{
+    "rds_host": "project-db-1.cudktryjuugx.us-east-1.rds.amazonaws.com",
+    "rds_port": "3306",
+    "rds_user": "admin1",
+    "rds_password" : "34?AmaZing$$!",
+    "rds_db": "SWIFTIFY",
+    "server_host": "localhost",
+    "server_port": "8000"
+}
