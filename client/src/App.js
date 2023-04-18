@@ -6,26 +6,27 @@ import { createTheme } from "@mui/material/styles";
 
 // ADD PAGE/COMPONENT IMPORTS HERE
 import MainPage from './pages/MainPage'
+import NavBar from './components/NavBar'
 
 // CHANGE THEME COLORS AND OTHER CUSTOMIZATIONS
 export const theme = createTheme({
-    palette: {
-        primary: indigo,
-        secondary: amber,
-    },
+  palette: {
+    primary: indigo,
+    secondary: amber,
+  },
 })
 
 export default function App() {
-    return (
-        <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-            {/* <NavBar /> */}
-            <Routes>
-                <Route path="/" element={<MainPage />}/>
-                {/* ADD PAGE ROUTES HERE */}
-            </Routes>
-        </BrowserRouter>
-        </ThemeProvider>
-    )
+  return (
+    <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <BrowserRouter>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<MainPage />}/>
+        {/* ADD PAGE ROUTES HERE */}
+      </Routes>
+    </BrowserRouter>
+    </ThemeProvider>
+  )
 }
