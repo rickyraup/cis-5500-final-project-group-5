@@ -8,15 +8,16 @@ export default function SearchPage() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
   const [selectedSongId, setSelectedSongId] = useState(null);
-
   const [name, setName] = useState('');
+  // 0=song, 1=artist, 2=album
+  const [searchType, setSearchType] = useState(0);
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/searchArtists`)
+    fetch(`http://${config.server_host}:${config.server_port}/searchSongs`)
       .then(res => res.json())
       .then(resJson => {
-        const artistsWithId = resJson.map((artist) => ({ id: artist.artist, ...artist }));
-        setData(artistsWithId);
+        const songsWithId = resJson.map((song) => ({ id: song.id, ...song }));
+        setData(songsWithId);
       });
   }, []);
 
@@ -54,10 +55,13 @@ export default function SearchPage() {
   // will automatically lay out all the grid items into rows based on their xs values.
   return (
     <Container>
-      <h2>Search Artists</h2>
+      <h2>Search!</h2>
       <Grid container spacing={6}>
         <Grid item xs={8}>
           <TextField label='Name' value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}/>
+        </Grid>
+        <Grid item xs={4}>
+          PLACE SELECTOR HERE!
         </Grid>
       </Grid>
       <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
