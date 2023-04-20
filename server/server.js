@@ -10,7 +10,9 @@ app.use(cors({
 }));
 
 // ADD ROUTE REQUESTS HERE
-
+app.get('/searchArtists', routes.search_artists);
+app.get('/searchAlbums', routes.search_albums);
+app.get('/searchSongs', routes.search_songs);
 
 
 app.listen(config.server_port, () => {

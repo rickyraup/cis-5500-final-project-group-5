@@ -6,6 +6,9 @@ import { createTheme } from "@mui/material/styles";
 
 // ADD PAGE/COMPONENT IMPORTS HERE
 import MainPage from './pages/MainPage'
+import ArtistsPage from './pages/ArtistsPage'
+import AlbumsPage from './pages/AlbumsPage'
+import SongsPage from './pages/SongsPage'
 import NavBar from './components/NavBar'
 
 // CHANGE THEME COLORS AND OTHER CUSTOMIZATIONS
@@ -25,6 +28,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MainPage />}/>
         {/* ADD PAGE ROUTES HERE */}
+        <Route path="/artists" element={<ArtistsPage />} />
+        <Route path="/albums" element={<AlbumsPage />} />
+        <Route path="/songs" element={<SongsPage />} />
       </Routes>
     </BrowserRouter>
     </ThemeProvider>
