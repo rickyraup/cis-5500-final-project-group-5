@@ -13,6 +13,7 @@ app.use(cors({
 app.get('/searchArtists', routes.search_artists);
 app.get('/searchAlbums', routes.search_albums);
 app.get('/searchSongs', routes.search_songs);
+app.get('/serachSongsAdvanced', routes.search_songs_advanced)
 
 
 app.listen(config.server_port, () => {
