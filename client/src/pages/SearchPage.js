@@ -23,7 +23,7 @@ export default function SearchPage() {
   const [duration, setDuration] = useState([0, 6100000]);
 
   // 0=song, 1=artist, 2=album
-  const [searchType, setSearchType] = useState(1);
+  const [searchType, setSearchType] = useState(0);
   const [searchAdvanced, setSearchAdvanced] = useState(false);
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function SearchPage() {
     </FormControl>
   )
 
-  const AdvancedOptions = () => (
+  const AdvancedOptions = (
     <>
       <Grid item xs={4}>
         <p>Danceability</p>
@@ -293,7 +293,7 @@ export default function SearchPage() {
             />
           </Grid>
         }
-        {searchAdvanced && <AdvancedOptions />}
+        {searchAdvanced && AdvancedOptions}
       </Grid>
       <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
