@@ -81,7 +81,7 @@ const search_songs_advanced = async function(req, res) {
   const energyLow = req.query.energy_low ?? 0;
   const energyHigh = req.query.energy_high ?? 1;
   const loudLow = req.query.loud_low ?? -60;
-  const loudHigh = req.query.loud_high ?? 8;
+  const loudHigh = req.query.loud_high ?? 10;
   const speechLow = req.query.speech_low ?? 0;
   const speechHigh = req.query.speech_high ?? 1;
   const acousticLow = req.query.acoustic_low ?? 0;
@@ -94,7 +94,7 @@ const search_songs_advanced = async function(req, res) {
   const valenceHigh = req.query.valence_high ?? 1;
   const tempoLow = req.query.tempo_low ?? 0;
   const tempoHigh = req.query.tempo_high ?? 250;
-  const durationLow = req.query.duration_low ?? 500;
+  const durationLow = req.query.duration_low ?? 0;
   const durationHigh = req.query.duration_high = 6100000;
 
   connection.query(`
