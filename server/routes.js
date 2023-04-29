@@ -69,8 +69,8 @@ const search_songs = async function(req, res) {
 const num_artists_by_country = async function(req, res) {
 
   connection.query(`
-    SELECT country, COUNT(artist) AS num
-      FROM Artists
+    SELECT country, COUNT(artist) AS numArtists
+      FROM Artist
       GROUP BY country
       WHERE country IS NOT NULL
     `, (err, data) => {
@@ -131,7 +131,28 @@ const search_songs_advanced = async function(req, res) {
   });
 }
 
+const rating_threshold_count = async function(req, res) {
+  const threshold = req.query.threshold ?? 0;
+
+  connection.query(`
+    SELECT Artist, COUNT(*) AS Num_Ratings
+    FROM Reviews
+    WHERE Rating > ${threshold}
+    GROUP BY Artist
+    ORDER BY COUNT(*) DESC
+    `, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json([]);
+    } else {
+      res.json(data);
+    }
+  }); 
+}
+
 const top_albums_in_range = async function(req, res) {
+  const dateLow = req.query.date_low ?? '1900-01-01'
+  const dateHigh = req.query.date_high ?? '2020-12-31'
   connection.query(`
     WITH top_100 AS (
       SELECT artist, country, tags, listeners
@@ -140,14 +161,14 @@ const top_albums_in_range = async function(req, res) {
       LIMIT 100
     ),
     top_albums AS (
-    SELECT DISTINCT album, artists, AVG(danceability) AS
-      danceability, SUM(duration_ms) / 6000 AS
-      duration_min, release_date
-    FROM Songs, top_100
-    GROUP BY album
-    WHERE (artists LIKE '%' + top_100.artist + '%') AND
-       (release_date >= DATE1) AND
-       (release_date <= DATE1)
+      SELECT DISTINCT album, artists, AVG(danceability) AS
+        danceability, SUM(duration_ms) / 6000 AS
+        duration_min, release_date
+      FROM Songs, top_100
+      GROUP BY album
+      WHERE (artists LIKE '%' + top_100.artist + '%') AND
+         (release_date >= ${dateLow}) AND
+         (release_date <= ${dateHigh})
     ),
     meta AS (
       SELECT Artist, DISTINCT Title, 'Metacritic Critic Score' AS 
@@ -181,5 +202,6 @@ module.exports = {
   search_songs,
   num_artists_by_country,
   search_songs_advanced,
+  rating_threshold_count,
   top_albums_in_range,
 }
