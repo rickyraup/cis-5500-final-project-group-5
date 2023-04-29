@@ -1,7 +1,6 @@
 const mysql = require('mysql')
 const config = require('./config.json')
 
-// CHANGE DATABASE NAME
 const connection = mysql.createConnection({
   host: config.rds_host,
   user: config.rds_user,
@@ -12,11 +11,8 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => err && console.log(err));
 
-// ADD ROUTES
 
 const search_artists = async function(req, res) {
-  // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
-  // Some default parameters have been provided for you, but you will need to fill in the rest
   const name = req.query.name ?? '';
 
   connection.query(`
@@ -29,14 +25,12 @@ const search_artists = async function(req, res) {
       console.log(err);
       res.json([]);
     } else {
-      res.json([...data]);
+      res.json(data);
     }
-  }); // replace this with your implementation
+  });
 }
 
 const search_albums = async function(req, res) {
-  // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
-  // Some default parameters have been provided for you, but you will need to fill in the rest
   const name = req.query.name ?? '';
 
   connection.query(`
@@ -49,14 +43,12 @@ const search_albums = async function(req, res) {
       console.log(err);
       res.json([]);
     } else {
-      res.json([...data]);
+      res.json(data);
     }
-  }); // replace this with your implementation
+  });
 }
 
 const search_songs = async function(req, res) {
-  // TODO (TASK 12): return all songs that match the given search query with parameters defaulted to those specified in API spec ordered by title (ascending)
-  // Some default parameters have been provided for you, but you will need to fill in the rest
   const name = req.query.name ?? '';
 
   connection.query(`
@@ -69,9 +61,26 @@ const search_songs = async function(req, res) {
       console.log(err);
       res.json([]);
     } else {
-      res.json([...data]);
+      res.json(data);
     }
-  }); // replace this with your implementation
+  }); 
+}
+
+const num_artists_by_country = async function(req, res) {
+
+  connection.query(`
+    SELECT country, COUNT(artist) AS num
+      FROM Artists
+      GROUP BY country
+      WHERE country IS NOT NULL
+    `, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json([]);
+    } else {
+      res.json(data);
+    }
+  });
 }
 
 const search_songs_advanced = async function(req, res) {
@@ -122,13 +131,55 @@ const search_songs_advanced = async function(req, res) {
   });
 }
 
-
+const top_albums_in_range = async function(req, res) {
+  connection.query(`
+    WITH top_100 AS (
+      SELECT artist, country, tags, listeners
+      FROM Artists
+      ORDER BY listeners DESC
+      LIMIT 100
+    ),
+    top_albums AS (
+    SELECT DISTINCT album, artists, AVG(danceability) AS
+      danceability, SUM(duration_ms) / 6000 AS
+      duration_min, release_date
+    FROM Songs, top_100
+    GROUP BY album
+    WHERE (artists LIKE '%' + top_100.artist + '%') AND
+       (release_date >= DATE1) AND
+       (release_date <= DATE1)
+    ),
+    meta AS (
+      SELECT Artist, DISTINCT Title, 'Metacritic Critic Score' AS 
+          critic_score, 'Metacritic Reviews' AS
+      critic_reviews, 'Metacritic User Score' AS
+      user_score, 'Metacritic User Reviews' AS
+      user_reviews
+      FROM Ratings
+    )
+    SELECT t100.artist, t100.country, t100.tags, t100.listeners, 
+        ta.album, ta.danceability, ta.duration_min,
+      ta.release_date, m.critic_score, m.critic_reviews,
+      m.user_score, m.user_reviews
+    FROM top_100 t100 JOIN top_albums ta 
+       ON ta.artists LIKE '%' + t100.artist + '%'
+       JOIN meta m ON t100.artist = m.Artist
+    `, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json([]);
+    } else {
+      res.json(data);
+    }
+  });
+}
 
 // ADD ROUTE VARS BELOW
 module.exports = {
   search_artists,
   search_albums,
   search_songs,
+  num_artists_by_country,
   search_songs_advanced,
+  top_albums_in_range,
 }
-

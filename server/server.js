@@ -13,7 +13,9 @@ app.use(cors({
 app.get('/searchArtists', routes.search_artists);
 app.get('/searchAlbums', routes.search_albums);
 app.get('/searchSongs', routes.search_songs);
+app.get('/numArtistsByCountry', routes.num_artists_by_country)
 app.get('/searchSongsAdvanced', routes.search_songs_advanced)
+app.get('/top_albums_in_range', routes.top_albums_in_range)
 
 
 app.listen(config.server_port, () => {
