@@ -11,7 +11,12 @@ const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json"
 
 const findCountryStat = (statType, countryName, countries) => {
-  const result = countries.filter(c => c.country === countryName)
+  var result = ''
+  if (countryName === 'United States of America') {
+    result = countries.filter(c => c.country === 'United States')
+  } else {
+    result = countries.filter(c => c.country === countryName)
+  }
   if (result.length === 0) {
     return 0
   }
@@ -39,7 +44,6 @@ const CountryMap = ({ setTooltipContent, countryData, statType }) => {
                 geography={geo}
                 data-tooltip-id='tt1'
                 onMouseEnter={() => {
-                  // NEED TO FIGURE OUT FORMAT OF countryData
                   if (statType === 0) {
                     setTooltipContent(`${geo.properties.name}: ${findCountryStat(statType, geo.properties.name, countryData)} artists`);
                   } else if (statType === 1) {

@@ -1,78 +1,76 @@
 import { useEffect, useState } from 'react';
-import { Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
+import { Divider, Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 const config = require('../config.json');
 
 export default function AlbumsPage() {
-  const [pageSize, setPageSize] = useState(10);
-  const [data, setData] = useState([]);
-  const [selectedSongId, setSelectedSongId] = useState(null);
-
-  const [name, setName] = useState('');
+  const [pageSize, setPageSize] = useState(10)
+  const [avgData, setAvgData] = useState([])
+  const [topData, setTopData] = useState([])
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/searchAlbums`)
-      .then(res => res.json())
-      .then(resJson => {
-        const albumsWithId = resJson.map((album) => ({ id: album.Title, ...album }));
-        setData(albumsWithId);
-      });
-  }, []);
+    fetch(`http://${config.server_host}:${config.server_port}/averageAlbums`)
+    .then(res => res.json())
+    .then(resJson => setAvgData(resJson))
 
-  const search = () => {
-    fetch(`http://${config.server_host}:${config.server_port}/searchAlbums?name=${name}`
-    )
-      .then(res => res.json())
-      .then(resJson => {
-        // DataGrid expects an array of objects with a unique id.
-        // To accomplish this, we use a map with spread syntax (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax)
-        const albumsWithId = resJson.map((album) => ({ id: album.Title, ...album }));
-        setData(albumsWithId);
-      });
-  }
-
-  // This defines the columns of the table of songs used by the DataGrid component.
-  // The format of the columns array and the DataGrid component itself is very similar to our
-  // LazyTable component. The big difference is we provide all data to the DataGrid component
-  // instead of loading only the data we need (which is necessary in order to be able to sort by column)
-  const columns = [
-    { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
-        <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    ) },
+    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange`)
+    .then(res => res.json())
+    .then(resJson => setTopData(resJson))
+  }, [])
+  const avgColumns = [
+    // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
+    //     // <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    // ) },
+    { field: 'Title', headerName: 'Title', width: 400},
     { field: 'Artist', headerName: 'Artist', width: 400},
-    { field: 'Release_Year', headerName: 'Year' , width: 100},
-    { field: 'Genre', headerName: 'Genre', width: 200}
+    { field: 'critic_score', headerName: 'Critic Score' , width: 100},
+    { field: 'user_score', headerName: 'User Score', width: 100},
+    { field: 'review_scores', headerName: 'Review Score', width: 100},
+    { field: 'danceability', headerName: 'Danceability', width: 100},
+    { field: 'duration_min', headerName: 'Length (min)', width: 100},
+    { field: 'release_date', headerName: 'Release Date', width: 100},
+  ]
+  const topColumns = [
+    // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
+    //     // <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    // ) },
+    { field: 'album', headerName: 'Title', width: 400},
+    { field: 'artist', headerName: 'Artist', width: 400},
+    { field: 'country', headerName: 'Country' , width: 100},
+    { field: 'tags', headerName: 'Tags', width: 100},
+    { field: 'listeners', headerName: 'Listeners', width: 100},
+    { field: 'danceability', headerName: 'Danceability', width: 100},
+    { field: 'duration_min', headerName: 'Length (min)', width: 100},
+    { field: 'release_date', headerName: 'Release Date', width: 100},
+    { field: 'critic_score', headerName: 'Critic Score', width: 100},
+    { field: 'critic_reviews', headerName: 'Critic Reviews', width: 100},
+    { field: 'user_score', headerName: 'User Score', width: 100},
+    { field: 'user_reviews', headerName: 'User Reviews', width: 100},
   ]
 
-  // This component makes uses of the Grid component from MUI (https://mui.com/material-ui/react-grid/).
-  // The Grid component is super simple way to create a page layout. Simply make a <Grid container> tag
-  // (optionally has spacing prop that specifies the distance between grid items). Then, enclose whatever
-  // component you want in a <Grid item xs={}> tag where xs is a number between 1 and 12. Each row of the
-  // grid is 12 units wide and the xs attribute specifies how many units the grid item is. So if you want
-  // two grid items of the same size on the same row, define two grid items with xs={6}. The Grid container
-  // will automatically lay out all the grid items into rows based on their xs values.
+
   return (
     <Container>
-      <h2>Search Albums</h2>
-      <Grid container spacing={6}>
-        <Grid item xs={8}>
-          <TextField label='Name' value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}/>
-        </Grid>
-      </Grid>
-      <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
-        Search
-      </Button>
-      <h2>Results</h2>
-      {/* Notice how similar the DataGrid component is to our LazyTable! What are the differences? */}
+      <h2>General Album Statistics</h2>
       <DataGrid
-        rows={data}
-        columns={columns}
+        rows={avgData}
+        columns={avgColumns}
+        pageSize={pageSize}
+        rowsPerPageOptions={[5, 10, 25]}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        autoHeight
+      />
+      <Divider />
+      <h2>Find Albums from the Top 100 All-Time Artists!</h2>
+      <DataGrid
+        rows={topData}
+        columns={topColumns}
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
         autoHeight
       />
     </Container>
-  );
+  )
 }
