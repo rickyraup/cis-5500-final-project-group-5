@@ -10,7 +10,7 @@ const config = require('../config.json')
 const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json"
 
-const CountryMap = ({ setTooltipContent, countryData }) => {
+const CountryMap = ({ setTooltipContent, countryData, statType }) => {
   
   return (
     <ComposableMap data-tip="">
@@ -23,7 +23,14 @@ const CountryMap = ({ setTooltipContent, countryData }) => {
                 geography={geo}
                 data-tooltip-id='tt1'
                 onMouseEnter={() => {
-                  setTooltipContent(`${geo.properties.name}: ${0} artists`);
+                  // NEED TO FIGURE OUT FORMAT OF countryData
+                  if (statType === 0) {
+                    setTooltipContent(`${geo.properties.name}: ${'{number of artists}'} artists`);
+                  } else if (statType === 1) {
+                    setTooltipContent(`${geo.properties.name}: ${'{name of top artist}'}`)
+                  } else {
+                    setTooltipContent(`${geo.properties.name}: ${'{average album rating}'}`)
+                  }
                 }}
                 onMouseLeave={() => {
                   setTooltipContent('');
@@ -52,15 +59,46 @@ const CountryMap = ({ setTooltipContent, countryData }) => {
 export default function CountriesPage() {
   const [content, setContent] = useState("")
   const [countryData, setCountryData] = useState([]) 
+  // 0 for numartists, 1 for topartist, 2 for avgalbumrating
+  const [statType, setStatType] = useState(0)
 
   useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/numArtistsByCountry`)
+    if (statType === 0) {
+      fetch(`http://${config.server_host}:${config.server_port}/numArtistsByCountry`)
       .then(res => res.json())
       .then(resJson => setCountryData(resJson))
-  }, [])
+    } else if (statType === 1) {
+      fetch(`http://${config.server_host}:${config.server_port}/topArtistByCountry`)
+      .then(res => res.json())
+      .then(resJson => setCountryData(resJson))
+    } else {
+      fetch(`http://${config.server_host}:${config.server_port}/averageCountryRating`)
+      .then(res => res.json())
+      .then(resJson => setCountryData(resJson))
+    }
+  }, [statType])
   return (
     <Container>
-      <CountryMap setTooltipContent={setContent} countryData={countryData}/>
+      <br />
+      <Grid container spacing={6}>
+        <Grid item xs={6}>
+          <FormControl>
+            <InputLabel id="stat-type-label">Statistics</InputLabel>
+            <Select
+              labelId='stat-type-label'
+              id='stat-type-select'
+              value={statType}
+              label='Statistics'
+              onChange={e => setStatType(e.target.value)}
+            >
+              <MenuItem value={0}>Number of Artists</MenuItem>
+              <MenuItem value={1}>Top Artist</MenuItem>
+              <MenuItem value={2}>Average Album Rating</MenuItem>              
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <CountryMap setTooltipContent={setContent} countryData={countryData} statType={statType}/>
       <Tooltip id='tt1'>{content}</Tooltip>
     </Container>
   )
