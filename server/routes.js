@@ -252,6 +252,8 @@ const top_albums_in_range = async function(req, res) {
       FROM Songs, top_100
       GROUP BY album
       WHERE (artists LIKE '%' + top_100.artist + '%') AND
+         (release_date IS NOT NULL) AND
+         (DATE <> '0000') AND
          (release_date >= ${dateLow}) AND
          (release_date <= ${dateHigh})
     ),
