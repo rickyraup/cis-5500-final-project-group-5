@@ -10,6 +10,7 @@ import ArtistsPage from './pages/ArtistsPage'
 import AlbumsPage from './pages/AlbumsPage'
 import SongsPage from './pages/SongsPage'
 import SearchPage from './pages/SearchPage'
+import CountriesPage from './pages/CountriesPage'
 import NavBar from './components/NavBar'
 
 // CHANGE THEME COLORS AND OTHER CUSTOMIZATIONS
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/artists" element={<ArtistsPage />} />
         <Route path="/albums" element={<AlbumsPage />} />
         <Route path="/songs" element={<SongsPage />} />
+        <Route path="/countries" element={<CountriesPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Routes>
     </BrowserRouter>

@@ -42,6 +42,7 @@ export default function SearchPage() {
       .then(resJson => {
         const artistsWithId = resJson.map((artist) => ({ id: artist.artist, ...artist }));
         setData(artistsWithId);
+        console.log(artistsWithId)
       });
     } else {
       fetch(`http://${config.server_host}:${config.server_port}/searchAlbums`)

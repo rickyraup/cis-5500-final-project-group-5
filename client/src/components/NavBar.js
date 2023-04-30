@@ -36,6 +36,7 @@ export default function NavBar() {
           <NavText href='/albums' text='Albums' />
           <NavText href='/songs' text='Songs' />
           <NavText href='/search' text='Search' />
+          <NavText href='/countries' text='Countries' />
         </Toolbar>
       </Container>
     </AppBar>
