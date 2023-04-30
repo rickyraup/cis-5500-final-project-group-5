@@ -323,11 +323,9 @@ const highest_rated_albums_per_artist = async function(req, res) {
 }
 
 const average_country_rating = async function(req, res) {
-  const country = req.query.country ?? '';
   connection.query(`
     SELECT AVG(Rating), country
     FROM Reviews JOIN Artist ON Artist.artist = Reviews.Artist
-    WHERE country = ${country}
     GROUP BY country
     ORDER BY AVG(Rating) DESC
   `, (err, data) => {

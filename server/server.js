@@ -21,7 +21,7 @@ app.get('/averageRating/:artist', routes.average_rating_artist)
 app.get('/averageAlbums', routes.average_albums)
 app.get('/topAlbumsInRange', routes.top_albums_in_range)
 app.get('/highestRatedAlbumsPerArtist', routes.highest_rated_albums_per_artist)
-app.get('/averageCountryRating/:country', routes.average_country_rating)
+app.get('/averageCountryRating', routes.average_country_rating)
 
 
 app.listen(config.server_port, () => {
