@@ -10,6 +10,22 @@ const config = require('../config.json')
 const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json"
 
+const findCountryStat = (statType, countryName, countries) => {
+  const result = countries.filter(c => c.country === countryName)
+  if (result.length === 0) {
+    return 0
+  }
+  if (statType === 0) {
+    return result[0].numArtists
+  }
+  if (statType === 1) {
+    return result[0].artist
+  } 
+  if (statType === 2) {
+    return result[0].averageScore
+  }
+  return "INVALID statType"
+}
 const CountryMap = ({ setTooltipContent, countryData, statType }) => {
   
   return (
@@ -25,11 +41,11 @@ const CountryMap = ({ setTooltipContent, countryData, statType }) => {
                 onMouseEnter={() => {
                   // NEED TO FIGURE OUT FORMAT OF countryData
                   if (statType === 0) {
-                    setTooltipContent(`${geo.properties.name}: ${'{number of artists}'} artists`);
+                    setTooltipContent(`${geo.properties.name}: ${findCountryStat(statType, geo.properties.name, countryData)} artists`);
                   } else if (statType === 1) {
-                    setTooltipContent(`${geo.properties.name}: ${'{name of top artist}'}`)
+                    setTooltipContent(`${geo.properties.name}: ${findCountryStat(statType, geo.properties.name, countryData)}`)
                   } else {
-                    setTooltipContent(`${geo.properties.name}: ${'{average album rating}'}`)
+                    setTooltipContent(`${geo.properties.name}: ${findCountryStat(statType, geo.properties.name, countryData)}`)
                   }
                 }}
                 onMouseLeave={() => {

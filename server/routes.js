@@ -71,8 +71,8 @@ const num_artists_by_country = async function(req, res) {
   connection.query(`
     SELECT country, COUNT(artist) AS numArtists
       FROM Artist
-      GROUP BY country
       WHERE country IS NOT NULL
+      GROUP BY country
     `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
