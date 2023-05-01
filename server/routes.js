@@ -181,10 +181,26 @@ const rating_threshold_count = async function(req, res) {
   }); 
 }
 
+const average_rating_artist_all = async function(req, res) {
+  connection.query(`
+  SELECT Artist, AVG(Rating) AS AvgRating
+  FROM Reviews
+  GROUP BY Artist
+  ORDER BY AvgRating DESC
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json([]);
+    } else {
+      res.json(data);
+    }
+  }); 
+}
+
 const average_rating_artist = async function(req, res) {
   const artist = req.params.artist ?? ''
   connection.query(`
-  SELECT Artist, AVG(Rating) AvgRating
+  SELECT Artist, AVG(Rating) AS AvgRating
   FROM Reviews
   WHERE Artist = ${artist}
   GROUP BY Artist
@@ -348,6 +364,7 @@ module.exports = {
   search_songs_advanced,
   top_artist_by_country,
   rating_threshold_count,
+  average_rating_artist_all,
   average_rating_artist,
   average_albums,
   top_albums_in_range,
