@@ -303,36 +303,45 @@ const top_albums_in_range = async function(req, res) {
 
 const highest_rated_albums_per_artist = async function(req, res) {
   connection.query(`
-    WITH avg_ratings AS (
-      SELECT Artist, Title, AVG(Rating)AS avg_rating
-      FROM Reviews
-      GROUP BY Artist, Title
-    ),
-    album_mc_scores AS (
-      SELECT Album, Metacritic_User_Score
-      FROM Albums
-    ), 
-    max_album AS (
-      SELECT a.Artist, a.Title, a.avg_rating
+  WITH avg_ratings AS (
+    SELECT Artist, Title, AVG(Rating) AS avg_rating
+    FROM Review
+    GROUP BY Artist, Title
+  ),
+  album_mc_scores AS (
+      SELECT Title, Metacritic_User_Score
+      FROM Album
+      WHERE Metacritic_User_Score IS NOT NULL
+  ),
+  max_album AS (
+      SELECT a.Artist, a.Title, MAX(a.avg_rating) AS avg_rating
       FROM avg_ratings a
-      WHERE avg_rating = MAX(SELECT MAX(b.avg_rating)
-                FROM avg_ratings b
-                WHERE a.Artist = b.Artist
-    ),
-    danceabilities AS (
-      SELECT album, AVG(danceability) AS avg_dance
+      GROUP BY a.Artist
+  ),
+  qualities AS (
+      SELECT album, AVG(danceability) AS avg_dance, AVG(energy) AS avg_energy,
+          AVG(loudness) AS avg_loudness, AVG(speechiness) AS avg_speechiness,
+          AVG(acousticness) AS avg_acousticness, AVG(instrumentalness) AS avg_instrumentalness,
+          AVG(liveness) AS avg_liveness, AVG(valence) AS avg_valence,
+          AVG(tempo) AS avg_tempo, SUM(duration_ms) / 6000 AS duration_min, release_date
       FROM Song
       GROUP BY album
-    ),
-    dance_and_rating AS (
-      SELECT a.Artist AS artist, a.Title AS album, b.avg_dance as avg_dance, a.avg_rating AS avg_rating
-      FROM max_album a JOIN danceabilities b
-                      ON a.Title = b.album
-    ),
-    SELECT a.artist AS artist, a.album AS album, a.avg_dance AS avg_dance, a.avg_rating AS avg_rating, b.Metacritic_User_Score AS Metacritic_User_Score
-    FROM dance_and_rating a JOIN album_mc_scores b
-                ON a.album = b.Album
-    ORDER BY avg_dance, avg_rating, Metacritic_User_Score
+  ),
+  qualities_rating AS (
+      SELECT a.Artist AS artist, a.Title AS album, b.avg_dance as avg_dance,
+            b.avg_energy AS avg_energy, b.avg_loudness AS avg_loudness,
+            b.avg_speechiness AS avg_speechiness, b.avg_acousticness AS avg_acousticness,
+            b.avg_instrumentalness AS avg_instrumentalness, b.avg_liveness AS avg_liveness,
+            b.avg_valence AS avg_valence, b.avg_tempo AS avg_tempo, b.duration_min AS duration,
+            b.release_date AS release_date, a.avg_rating AS avg_rating
+      FROM max_album a JOIN qualities b
+          ON a.Title = b.album
+      GROUP BY a.Title
+  )
+  SELECT a.artist AS artist, a.album AS album, a.avg_dance AS avg_dance, a.avg_rating AS avg_rating, b.Metacritic_User_Score AS Metacritic_User_Score
+  FROM qualities_rating a JOIN album_mc_scores b
+      ON a.album = b.Title
+  ORDER BY avg_dance, avg_rating, Metacritic_User_Score;
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
