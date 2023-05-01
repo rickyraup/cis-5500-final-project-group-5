@@ -131,13 +131,24 @@ const search_songs_advanced = async function(req, res) {
   });
 }
 
-const top_artist_by_country = async function(req, res) {
-  connection.query(`
-  WITH artists_in_album AS (SELECT alb.artist, alb.Metacritic_Critic_Score AS critic_score
+/**
+`
+  WITH artists_in_album AS (SELECT alb.artist AS Artist, alb.Metacritic_Critic_Score AS critic_score
     FROM Album alb)
   SELECT a.artist AS artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
   FROM Artist a, artists_in_album b
-  WHERE UPPER(a.artist) IN (SELECT UPPER(Artist) FROM artists_in_album) AND UPPER(a.artist) = UPPER(b.Artist)
+  WHERE UPPER(a.artist) = UPPER(b.Artist)
+  GROUP BY country 
+  `
+ */
+
+const top_artist_by_country = async function(req, res) {
+  connection.query(`
+  WITH artists_in_album AS (SELECT alb.artist AS Artist, alb.Metacritic_Critic_Score AS critic_score
+    FROM Album alb)
+  SELECT a.artist AS artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
+  FROM Artist a, artists_in_album b
+  WHERE UPPER(a.artist) = UPPER(b.Artist)
   GROUP BY country 
   `, (err, data) => {
     if (err || data.length === 0) {

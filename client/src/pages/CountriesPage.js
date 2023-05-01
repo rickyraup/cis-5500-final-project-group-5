@@ -87,7 +87,10 @@ export default function CountriesPage() {
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/numArtistsByCountry`)
     .then(res => res.json())
-    .then(resJson => setCountryData1(resJson))
+    .then(resJson => {
+      console.log(resJson);
+      setCountryData1(resJson);
+    })
 
 
   }, [])
@@ -104,7 +107,10 @@ export default function CountriesPage() {
 
     fetch(`http://${config.server_host}:${config.server_port}/topArtistByCountry`)
     .then(res => res.json())
-    .then(resJson => setCountryData2(resJson))
+    .then(resJson => {
+      console.log(resJson);
+      setCountryData2(resJson);
+    })
   }, [])
 
   return (
