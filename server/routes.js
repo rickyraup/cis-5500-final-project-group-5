@@ -231,6 +231,7 @@ const average_albums = async function(req, res) {
       a.liveness, a.valence, a.tempo, a.duration_min, a.release_date
   FROM meta m JOIN critic_reviews cr ON m.Title = cr.Title
   JOIN albums a ON m.Title = a.album
+  GROUP BY Title, Artist
   ORDER BY m.critic_score DESC
   `, (err, data) => {
     if (err || data.length === 0) {
@@ -279,6 +280,8 @@ const top_albums_in_range = async function(req, res) {
   FROM top_100 t100 JOIN top_albums ta
       ON ta.artist = t100.artist
       JOIN meta m ON t100.artist = m.Artist
+  GROUP BY t100.artist, t100.country
+  ORDER BY t100.listeners DESC
     `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);

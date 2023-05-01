@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Divider, Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker' 
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
 const config = require('../config.json');
 
@@ -21,11 +22,11 @@ export default function AlbumsPage() {
     .then(resJson => setAvgData(resJson))
   }, [])
 
-  // useEffect(() => {
-  //   fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateLow}&date_high=${dateHigh}`)
-  //   .then(res => res.json())
-  //   .then(resJson => setTopData(resJson))
-  // }, [dateLow, dateHigh])
+  useEffect(() => {
+    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateLow.format('YYYY-MM-DD')}&date_high=${dateHigh.format('YYYY-MM-DD')}`)
+    .then(res => res.json())
+    .then(resJson => setTopData(resJson))
+  }, [dateLow, dateHigh])
 
   
   const avgColumns = [
@@ -59,6 +60,7 @@ export default function AlbumsPage() {
     { field: 'user_reviews', headerName: 'User Reviews', width: 100},
   ]
 
+  
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -75,6 +77,7 @@ export default function AlbumsPage() {
       />
       <Divider />
       <h2>Find Albums from the Top 100 All-Time Artists!</h2>
+
       <DatePicker
         label="Start Date"
         value={dateLow}

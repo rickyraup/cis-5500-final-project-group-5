@@ -3,7 +3,8 @@ import { Button, Switch, Checkbox, Container, FormControl, FormControlLabel, Gri
 import { DataGrid, heIL } from '@mui/x-data-grid';
 import { formatDuration } from '../helpers/formatter';
 // import * from 
-
+// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import dayjs from 'dayjs';
 const config = require('../config.json');
 
 export default function SearchPage() {
@@ -22,6 +23,8 @@ export default function SearchPage() {
   const [valence, setValence] = useState([0, 1]);
   const [tempo, setTempo] = useState([0, 250]);
   const [duration, setDuration] = useState([0, 6100000]);
+  // const [date, setDate] = useState([dayjs('1900-01-01').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')]);
+
 
   // 0=song, 1=artist, 2=album
   const [searchType, setSearchType] = useState(0);
