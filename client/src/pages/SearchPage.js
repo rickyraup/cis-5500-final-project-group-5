@@ -101,28 +101,31 @@ export default function SearchPage() {
   }
 
   const songColumns = [
-    { field: 'name', headerName: 'Name', width: 200, renderCell: (params) => (
-        <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    ) },
-    { field: 'artists', headerName: 'Artists', width: 400},
+    // { field: 'name', headerName: 'Name', width: 200, renderCell: (params) => (
+    //     <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    // ) },
+    { field: 'name', headerName: 'Name', width: 200},
+    { field: 'artist', headerName: 'Artists', width: 400},
     { field: 'album', headerName: 'Album' , width: 300},
     { field: 'duration_ms', headerName: 'Length (ms)', width: 100},
-    { field: 'release_date', headerName: 'Release Date', width: 100},
+    { field: 'release_date', headerName: 'Release Date', width: 130},
   ]
 
   const artistColumns = [
-    { field: 'artist', headerName: 'Artist', width: 300, renderCell: (params) => (
-        <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    ) },
+    // { field: 'artist', headerName: 'Artist', width: 300, renderCell: (params) => (
+    //     <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    // ) },
+    { field: 'artist', headerName: 'Artist', width: 300},
     { field: 'country', headerName: 'Country', width: 150},
     { field: 'tags', headerName: 'Genres' , width: 600},
     { field: 'listeners', headerName: 'Listeners' }
   ]
 
   const albumColumns = [
-    { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
-        <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    ) },
+    // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
+    //     <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    // ) },
+    { field: 'Title', headerName: 'Title', width: 400},
     { field: 'Artist', headerName: 'Artist', width: 400},
     { field: 'Release_Year', headerName: 'Year' , width: 100},
     { field: 'Genre', headerName: 'Genre', width: 200}

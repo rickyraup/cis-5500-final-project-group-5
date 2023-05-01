@@ -39,7 +39,7 @@ export default function ArtistsPage() {
     //     // <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
     // ) },
     { field: 'Artist', headerName: 'Artist', width: 400},
-    { field: 'Num_Ratings', headerName: 'Number of Ratings' , width: 400},
+    { field: 'Num_Ratings', headerName: 'Number of Ratings Meeting Threshold' , width: 600},
   ]
   const highColumns = [
     { field: 'artist', headerName: 'Artist', width: 400},

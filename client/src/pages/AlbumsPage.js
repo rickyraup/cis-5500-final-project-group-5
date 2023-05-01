@@ -36,10 +36,10 @@ export default function AlbumsPage() {
     { field: 'Artist', headerName: 'Artist', width: 400},
     { field: 'critic_score', headerName: 'Critic Score' , width: 100},
     { field: 'user_score', headerName: 'User Score', width: 100},
-    { field: 'review_scores', headerName: 'Review Score', width: 100},
-    { field: 'danceability', headerName: 'Danceability', width: 100},
-    { field: 'duration_min', headerName: 'Length (min)', width: 100},
-    { field: 'release_date', headerName: 'Release Date', width: 100},
+    { field: 'review_scores', headerName: 'Review Score', width: 150},
+    { field: 'danceability', headerName: 'Danceability', width: 150},
+    { field: 'duration_min', headerName: 'Length (min)', width: 150},
+    { field: 'release_date', headerName: 'Release Date', width: 150},
   ]
   const topColumns = [
     // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
@@ -47,14 +47,14 @@ export default function AlbumsPage() {
     // ) },
     { field: 'album', headerName: 'Title', width: 400},
     { field: 'artist', headerName: 'Artist', width: 400},
-    { field: 'country', headerName: 'Country' , width: 100},
-    { field: 'tags', headerName: 'Tags', width: 100},
+    { field: 'country', headerName: 'Country' , width: 200},
+    { field: 'tags', headerName: 'Tags', width: 400},
     { field: 'listeners', headerName: 'Listeners', width: 100},
     { field: 'danceability', headerName: 'Danceability', width: 100},
     { field: 'duration_min', headerName: 'Length (min)', width: 100},
-    { field: 'release_date', headerName: 'Release Date', width: 100},
+    { field: 'release_date', headerName: 'Release Date', width: 150},
     { field: 'critic_score', headerName: 'Critic Score', width: 100},
-    { field: 'critic_reviews', headerName: 'Critic Reviews', width: 100},
+    { field: 'critic_reviews', headerName: 'Critic Reviews', width: 120},
     { field: 'user_score', headerName: 'User Score', width: 100},
     { field: 'user_reviews', headerName: 'User Reviews', width: 100},
   ]
