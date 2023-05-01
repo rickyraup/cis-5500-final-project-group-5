@@ -133,30 +133,18 @@ const search_songs_advanced = async function(req, res) {
 
 const top_artist_by_country = async function(req, res) {
   connection.query(`
-  CREATE INDEX listeners_index
-  ON Artists(listeners);
-  
-  WITH top_in_country AS (
-    SELECT a1.country, MAX(a1.listeners) AS listeners
-    FROM Artists a1
-    JOIN (
-    SELECT a2.artist, a2.tags
-    FROM Artists a2
-    WHERE (a1.country = a2.country) AND
-      (a2.listeners = MAX(a1.listeners))
-  ) info ON a1.country = info.country
-    GROUP BY country
-  )
-  SELECT tic.country, tic.artist, tic.tags, tic.listeners,
-    rat.Title AS album, ‘Metacritic Critic Score’ AS
-    critic_score
-  FROM top_in_country tic JOIN Ratings rat
-  ON UPPER(tic.artist) = UPPER(rat.Artist)  
+  WITH artists_in_album AS (SELECT alb.artist, alb.Metacritic_Critic_Score AS critic_score
+    FROM Album alb)
+  SELECT a.artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
+  FROM Artist a, artists_in_album b
+  WHERE UPPER(a.artist) IN (SELECT UPPER(Artist) FROM artists_in_album) AND UPPER(a.artist) = UPPER(b.Artist)
+  GROUP BY country 
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
       res.json([]);
     } else {
+      console.log(data);
       res.json(data);
     }
   }); 
@@ -354,7 +342,7 @@ const highest_rated_albums_per_artist = async function(req, res) {
 
 const average_country_rating = async function(req, res) {
   connection.query(`
-    SELECT AVG(Rating), country
+    SELECT country, AVG(Rating)
     FROM Review JOIN Artist ON Artist.artist = Review.Artist
     GROUP BY country
     ORDER BY AVG(Rating) DESC

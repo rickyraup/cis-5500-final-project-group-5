@@ -54,6 +54,7 @@ export default function ArtistsPage() {
     <Container>
       <h2>Average Artist Ratings!</h2>
       <DataGrid
+        getRowId={(row) => row.Artist}
         rows={avgData}
         columns={avgColumns}
         pageSize={pageSize}
@@ -64,6 +65,7 @@ export default function ArtistsPage() {
       <Divider />
       <h2>What is Each Artist's Best Album?</h2>
       <DataGrid
+        getRowId={(row) => row.artist}
         rows={highData}
         columns={highColumns}
         pageSize={pageSize}
@@ -83,6 +85,7 @@ export default function ArtistsPage() {
           valueLabelDisplay='auto'
         />
       <DataGrid
+        getRowId={(row) => row.Artist}
         rows={thresholdData}
         columns={thrColumns}
         pageSize={pageSize}

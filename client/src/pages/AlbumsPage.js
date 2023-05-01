@@ -55,6 +55,7 @@ export default function AlbumsPage() {
     <Container>
       <h2>General Album Statistics</h2>
       <DataGrid
+        getRowId={(row) => row.Title}
         rows={avgData}
         columns={avgColumns}
         pageSize={pageSize}
@@ -73,6 +74,7 @@ export default function AlbumsPage() {
           valueLabelDisplay='auto'
         />
       <DataGrid
+        getRowId={(row) => row.album}
         rows={topData}
         columns={topColumns}
         pageSize={pageSize}

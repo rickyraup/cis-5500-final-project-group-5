@@ -300,8 +300,8 @@ export default function SearchPage() {
         Search
       </Button>
       <h2>Results</h2>
-      {/* Notice how similar the DataGrid component is to our LazyTable! What are the differences? */}
       <DataGrid
+        getRowId={(row) => (Math.random() * 100)}
         rows={data}
         columns={columns(searchType)}
         pageSize={pageSize}
