@@ -35,7 +35,7 @@ const search_albums = async function(req, res) {
 
   connection.query(`
     SELECT *
-      FROM Albums
+      FROM Album
       WHERE Title LIKE '%${name}%' 
       ORDER BY Title ASC
     `, (err, data) => {
@@ -108,7 +108,7 @@ const search_songs_advanced = async function(req, res) {
 
   connection.query(`
     SELECT *
-    FROM Songs
+    FROM Song
     WHERE name LIKE '%${name}%'
       AND danceability BETWEEN ${danceLow} AND ${danceHigh}
       AND energy BETWEEN ${energyLow} AND ${energyHigh}
@@ -120,7 +120,7 @@ const search_songs_advanced = async function(req, res) {
       AND valence BETWEEN ${valenceLow} AND ${valenceHigh}
       AND tempo BETWEEN ${tempoLow} AND ${tempoHigh}
       AND duration_ms BETWEEN ${durationLow} AND ${durationHigh}
-    ORDER BY title
+    ORDER BY name
   `, (err, data) => {
     if (err) {
       console.log(err);
@@ -167,7 +167,7 @@ const rating_threshold_count = async function(req, res) {
 
   connection.query(`
     SELECT Artist, COUNT(*) AS Num_Ratings
-    FROM Reviews
+    FROM Review
     WHERE Rating > ${threshold}
     GROUP BY Artist
     ORDER BY COUNT(*) DESC
