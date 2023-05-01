@@ -258,39 +258,39 @@ const top_albums_in_range = async function(req, res) {
   const dateLow = req.query.date_low ?? '1900-01-01'
   const dateHigh = req.query.date_high ?? '2020-12-31'
   connection.query(`
-    WITH top_100 AS (
-      SELECT artist, country, tags, listeners
-      FROM Artists
-      ORDER BY listeners DESC
-      LIMIT 100
-    ),
-    top_albums AS (
-      SELECT DISTINCT album, artists, AVG(danceability) AS
-        danceability, SUM(duration_ms) / 6000 AS
-        duration_min, release_date
-      FROM Songs, top_100
+  WITH top_100 AS (
+    SELECT artist, country, tags, listeners
+    FROM Artist
+    ORDER BY listeners DESC
+    LIMIT 100
+  ),
+  top_albums AS (
+      SELECT DISTINCT album, Song.artist,
+          AVG(danceability) AS danceability, AVG(energy) AS energy,
+          AVG(loudness) AS loudness, AVG(speechiness) AS speechiness,
+          AVG(acousticness) AS acousticness, AVG(instrumentalness) AS instrumentalness,
+          AVG(liveness) AS liveness, AVG(valence) AS valence,
+          AVG(tempo) AS tempo,  SUM(duration_ms) / 6000 AS duration_min, release_date
+      FROM Song JOIN top_100 ON Song.artist = top_100.artist
+      WHERE release_date IS NOT NULL AND
+          release_date <> 0000 AND
+          release_date >= '${dateLow}' AND
+          release_date <= '${dateHigh}'
       GROUP BY album
-      WHERE (artists LIKE '%' + top_100.artist + '%') AND
-         (release_date IS NOT NULL) AND
-         (DATE <> '0000') AND
-         (release_date >= ${dateLow}) AND
-         (release_date <= ${dateHigh})
-    ),
-    meta AS (
-      SELECT Artist, DISTINCT Title, 'Metacritic Critic Score' AS 
-          critic_score, 'Metacritic Reviews' AS
-      critic_reviews, 'Metacritic User Score' AS
-      user_score, 'Metacritic User Reviews' AS
-      user_reviews
-      FROM Ratings
-    )
-    SELECT t100.artist, t100.country, t100.tags, t100.listeners, 
-        ta.album, ta.danceability, ta.duration_min,
+  ),
+  meta AS (
+      SELECT DISTINCT Title, Artist, Metacritic_Critic_Score AS critic_score,
+          Metacritic_Reviews AS critic_reviews, Metacritic_User_Score AS user_score,
+          Metacritic_User_Reviews AS user_reviews
+      FROM Album
+  )
+  SELECT t100.artist, t100.country, t100.tags, t100.listeners,
+      ta.album, ta.danceability, ta.duration_min,
       ta.release_date, m.critic_score, m.critic_reviews,
       m.user_score, m.user_reviews
-    FROM top_100 t100 JOIN top_albums ta 
-       ON ta.artists LIKE '%' + t100.artist + '%'
-       JOIN meta m ON t100.artist = m.Artist
+  FROM top_100 t100 JOIN top_albums ta
+      ON ta.artist = t100.artist
+      JOIN meta m ON t100.artist = m.Artist
     `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
