@@ -21,11 +21,13 @@ export default function AlbumsPage() {
     .then(resJson => setAvgData(resJson))
   }, [])
 
-  useEffect(() => {
-    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateLow}&date_high=${dateHigh}`)
-    .then(res => res.json())
-    .then(resJson => setTopData(resJson))
-  }, [dateLow, dateHigh])
+  // useEffect(() => {
+  //   fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateLow}&date_high=${dateHigh}`)
+  //   .then(res => res.json())
+  //   .then(resJson => setTopData(resJson))
+  // }, [dateLow, dateHigh])
+
+  
   const avgColumns = [
     // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
     //     // <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
