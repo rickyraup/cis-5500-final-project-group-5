@@ -6,6 +6,7 @@ const config = require('../config.json');
 
 export default function AlbumsPage() {
   const [pageSize, setPageSize] = useState(10)
+  const [dateRange, setDateRange] = useState(['1900-01-01', '2020-12-31'])
   const [avgData, setAvgData] = useState([])
   const [topData, setTopData] = useState([])
 
@@ -14,7 +15,7 @@ export default function AlbumsPage() {
     .then(res => res.json())
     .then(resJson => setAvgData(resJson))
 
-    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange`)
+    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateRange[0]}&date_high=${dateRange[1]}`)
     .then(res => res.json())
     .then(resJson => setTopData(resJson))
   }, [])
@@ -63,6 +64,14 @@ export default function AlbumsPage() {
       />
       <Divider />
       <h2>Find Albums from the Top 100 All-Time Artists!</h2>
+      <Slider
+          value={dateRange}
+          min={'1900-01-01'}
+          max={'2020-12-31'}
+          step={0.025}
+          onChange={(e, newValue) => setDateRange(newValue)}
+          valueLabelDisplay='auto'
+        />
       <DataGrid
         rows={topData}
         columns={topColumns}

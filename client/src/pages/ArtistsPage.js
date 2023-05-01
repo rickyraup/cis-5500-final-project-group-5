@@ -8,12 +8,17 @@ export default function ArtistsPage() {
   const [pageSize, setPageSize] = useState(10)
   const [avgData, setAvgData] = useState([])
   const [thresholdData, setThresholdData] = useState([])
+  const [highData, setHighData] = useState([])
   const [threshold, setThreshold] = useState(0)
 
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/averageRating`)
     .then(res => res.json())
     .then(resJson => setAvgData(resJson))
+
+    fetch(`http://${config.server_host}:${config.server_port}/highestRatedAlbumsPerArtist`)
+    .then(res => res.json())
+    .then(resJson => setHighData(resJson))
   }, [])
 
   useEffect(() => {
@@ -36,6 +41,13 @@ export default function ArtistsPage() {
     { field: 'Artist', headerName: 'Artist', width: 400},
     { field: 'Num_Ratings', headerName: 'Number of Ratings' , width: 400},
   ]
+  const highColumns = [
+    { field: 'artist', headerName: 'Artist', width: 400},
+    { field: 'album', headerName: 'Album' , width: 400},
+    { field: 'avg_dance', headerName: 'Average Danceability', width: 400},
+    { field: 'avg_rating', headerName: 'Average Rating' , width: 400},
+    { field: 'Metacritic_User_Score', headerName: 'Metacritic User Score' , width: 400},
+  ]
 
 
   return (
@@ -44,6 +56,16 @@ export default function ArtistsPage() {
       <DataGrid
         rows={avgData}
         columns={avgColumns}
+        pageSize={pageSize}
+        rowsPerPageOptions={[5, 10, 25]}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        autoHeight
+      />
+      <Divider />
+      <h2>What is Each Artist's Best Album?</h2>
+      <DataGrid
+        rows={highData}
+        columns={highColumns}
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

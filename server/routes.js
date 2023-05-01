@@ -322,11 +322,11 @@ const highest_rated_albums_per_artist = async function(req, res) {
       GROUP BY album
     ),
     dance_and_rating AS (
-      SELECT a.Title AS album, b.avg_dance as avg_dance, a.avg_rating AS avg_rating
+      SELECT a.Artist AS artist, a.Title AS album, b.avg_dance as avg_dance, a.avg_rating AS avg_rating
       FROM max_album a JOIN danceabilities b
                       ON a.Title = b.album
     ),
-    SELECT a.album AS album, a.avg_dance AS avg_dance, a.avg_rating AS avg_rating, b.Metacritic_User_Score AS Metacritic_User_Score
+    SELECT a.artist AS artist, a.album AS album, a.avg_dance AS avg_dance, a.avg_rating AS avg_rating, b.Metacritic_User_Score AS Metacritic_User_Score
     FROM dance_and_rating a JOIN album_mc_scores b
                 ON a.album = b.Album
     ORDER BY avg_dance, avg_rating, Metacritic_User_Score
