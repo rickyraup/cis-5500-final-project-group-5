@@ -135,7 +135,7 @@ const top_artist_by_country = async function(req, res) {
   connection.query(`
   WITH artists_in_album AS (SELECT alb.artist, alb.Metacritic_Critic_Score AS critic_score
     FROM Album alb)
-  SELECT a.artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
+  SELECT a.artist AS artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
   FROM Artist a, artists_in_album b
   WHERE UPPER(a.artist) IN (SELECT UPPER(Artist) FROM artists_in_album) AND UPPER(a.artist) = UPPER(b.Artist)
   GROUP BY country 
@@ -342,7 +342,7 @@ const highest_rated_albums_per_artist = async function(req, res) {
 
 const average_country_rating = async function(req, res) {
   connection.query(`
-    SELECT country, AVG(Rating)
+    SELECT country, AVG(Rating) AS avgRating
     FROM Review JOIN Artist ON Artist.artist = Review.Artist
     GROUP BY country
     ORDER BY AVG(Rating) DESC

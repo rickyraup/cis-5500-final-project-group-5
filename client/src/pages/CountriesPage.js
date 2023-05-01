@@ -27,7 +27,7 @@ const findCountryStat = (statType, countryName, countries) => {
     return result[0].artist
   } 
   if (statType === 2) {
-    return result[0].averageScore
+    return result[0].avgRating
   }
   return "INVALID statType"
 }
@@ -78,25 +78,35 @@ const CountryMap = ({ setTooltipContent, countryData, statType }) => {
 
 export default function CountriesPage() {
   const [content, setContent] = useState("")
-  const [countryData, setCountryData] = useState([]) 
+  const [countryData1, setCountryData1] = useState([])
+  const [countryData2, setCountryData2] = useState([])
+  const [countryData3, setCountryData3] = useState([]) 
   // 0 for numartists, 1 for topartist, 2 for avgalbumrating
   const [statType, setStatType] = useState(0)
 
   useEffect(() => {
-    if (statType === 0) {
-      fetch(`http://${config.server_host}:${config.server_port}/numArtistsByCountry`)
-      .then(res => res.json())
-      .then(resJson => setCountryData(resJson))
-    } else if (statType === 1) {
-      fetch(`http://${config.server_host}:${config.server_port}/topArtistByCountry`)
-      .then(res => res.json())
-      .then(resJson => setCountryData(resJson))
-    } else {
-      fetch(`http://${config.server_host}:${config.server_port}/averageCountryRating`)
-      .then(res => res.json())
-      .then(resJson => setCountryData(resJson))
-    }
-  }, [statType])
+    fetch(`http://${config.server_host}:${config.server_port}/numArtistsByCountry`)
+    .then(res => res.json())
+    .then(resJson => setCountryData1(resJson))
+
+
+  }, [])
+
+  useEffect(() => {
+
+    fetch(`http://${config.server_host}:${config.server_port}/averageCountryRating`)
+    .then(res => res.json())
+    .then(resJson => setCountryData3(resJson))
+
+  }, [])
+  useEffect(() => {
+
+
+    fetch(`http://${config.server_host}:${config.server_port}/topArtistByCountry`)
+    .then(res => res.json())
+    .then(resJson => setCountryData2(resJson))
+  }, [])
+
   return (
     <Container>
       <br />
@@ -118,7 +128,9 @@ export default function CountriesPage() {
           </FormControl>
         </Grid>
       </Grid>
-      <CountryMap setTooltipContent={setContent} countryData={countryData} statType={statType}/>
+      {statType === 0 && <CountryMap setTooltipContent={setContent} countryData={countryData1} statType={statType}/>}
+      {statType === 1 && <CountryMap setTooltipContent={setContent} countryData={countryData2} statType={statType}/>}
+      {statType === 2 && <CountryMap setTooltipContent={setContent} countryData={countryData3} statType={statType}/>}
       <Tooltip id='tt1'>{content}</Tooltip>
     </Container>
   )
