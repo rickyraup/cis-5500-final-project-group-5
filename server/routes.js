@@ -218,29 +218,32 @@ const average_rating_artist = async function(req, res) {
 const average_albums = async function(req, res) {
   connection.query(`
   WITH meta AS (
-    SELECT Artist, DISTINCT Title, ‘Metacritic Critic Score’ AS 
-        critic_score, ‘Metacritic User Score’ AS
-        user_score
-    FROM Ratings
+    SELECT DISTINCT Title, Artist, Metacritic_Critic_Score AS
+        critic_score, Metacritic_User_Score AS user_score
+    FROM Album
   ),
   critic_reviews AS (
-    SELECT Artist, DISTINCT Title, AVG(Rating) as review_scores
-    FROM Reviews
-    GROUP BY (Artist, Title)
+    SELECT DISTINCT Title, Artist, AVG(Rating) as review_scores
+    FROM Review
+    GROUP BY Artist, Title
   ),
   albums AS (
-    SELECT DISTINCT album, artists, AVG(danceability) AS
-    danceability, SUM(duration_ms) / 6000 AS
-    duration_min, release_date
-  FROM Songs
-  GROUP BY album
-  ),
-  SELECT m.Title, m.Artist, m.critic_score, m.user_score, 
-      cr.review_scores, a.danceability, a.duration_min,
-      a.release_date
+    SELECT DISTINCT album, artist,
+        AVG(danceability) AS danceability, AVG(energy) AS energy,
+        AVG(loudness) AS loudness, AVG(speechiness) AS speechiness,
+        AVG(acousticness) AS acousticness, AVG(instrumentalness) AS instrumentalness,
+        AVG(liveness) AS liveness, AVG(valence) AS valence,
+        AVG(tempo) AS tempo, SUM(duration_ms) / 60000 AS duration_min, release_date
+    FROM Song
+    GROUP BY album
+  )
+  SELECT m.Title, m.Artist, m.critic_score, m.user_score,
+      cr.review_scores, a.danceability, a.energy, a.loudness,
+      a.speechiness, a.acousticness, a.instrumentalness,
+      a.liveness, a.valence, a.tempo, a.duration_min, a.release_date
   FROM meta m JOIN critic_reviews cr ON m.Title = cr.Title
-  JOIN albums a ON m.Title = a.album 
-  ORDER BY m.critic_score DESC  
+  JOIN albums a ON m.Title = a.album
+  ORDER BY m.critic_score DESC
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
