@@ -168,7 +168,7 @@ const rating_threshold_count = async function(req, res) {
   connection.query(`
     SELECT Artist, COUNT(*) AS Num_Ratings
     FROM Review
-    WHERE Rating > ${threshold}
+    WHERE Rating >= ${threshold}
     GROUP BY Artist
     ORDER BY COUNT(*) DESC
     `, (err, data) => {
@@ -184,7 +184,7 @@ const rating_threshold_count = async function(req, res) {
 const average_rating_artist_all = async function(req, res) {
   connection.query(`
   SELECT Artist, AVG(Rating) AS AvgRating
-  FROM Reviews
+  FROM Review
   GROUP BY Artist
   ORDER BY AvgRating DESC
   `, (err, data) => {
@@ -201,7 +201,7 @@ const average_rating_artist = async function(req, res) {
   const artist = req.params.artist ?? ''
   connection.query(`
   SELECT Artist, AVG(Rating) AS AvgRating
-  FROM Reviews
+  FROM Review
   WHERE Artist = ${artist}
   GROUP BY Artist
   ORDER BY AvgRating DESC
@@ -343,7 +343,7 @@ const highest_rated_albums_per_artist = async function(req, res) {
 const average_country_rating = async function(req, res) {
   connection.query(`
     SELECT AVG(Rating), country
-    FROM Reviews JOIN Artist ON Artist.artist = Reviews.Artist
+    FROM Review JOIN Artist ON Artist.artist = Review.Artist
     GROUP BY country
     ORDER BY AVG(Rating) DESC
   `, (err, data) => {
