@@ -6,6 +6,6 @@ const config = require('../config.json');
 
 export default function MainPage() {
   return (
-    <div>Hello! Welcome to Music Match!</div>
+    <div>Hello! Welcome to Data Tune!</div>
   )
 }

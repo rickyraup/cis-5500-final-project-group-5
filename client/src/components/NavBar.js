@@ -42,7 +42,7 @@ export default function NavBar() {
     <AppBar position='static'>
       <Container maxWidth='xl'>
         <Toolbar disableGutters>
-          <NavText href='/' text='HOME' isMain />
+          <NavText href='/' text='DATATUNE' isMain />
           <NavText href='/albums' text='Albums' />
           <NavText href='/artists' text='Artists' />
           <NavText href='/search' text='Search' />
