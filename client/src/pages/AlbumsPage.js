@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Divider, Button, Checkbox, Container, FormControlLabel, Grid, Link, Slider, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import dayjs, { Dayjs } from 'dayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker' 
 
 const config = require('../config.json');
 
 export default function AlbumsPage() {
   const [pageSize, setPageSize] = useState(10)
-  const [dateRange, setDateRange] = useState(['1900-01-01', '2020-12-31'])
+  const [dateLow, setDateLow] = useState(dayjs('01-01-1990'))
+  const [dateHigh, setDateHigh] = useState(dayjs('12-31-2020'))
   const [avgData, setAvgData] = useState([])
   const [topData, setTopData] = useState([])
 
@@ -14,11 +19,13 @@ export default function AlbumsPage() {
     fetch(`http://${config.server_host}:${config.server_port}/averageAlbums`)
     .then(res => res.json())
     .then(resJson => setAvgData(resJson))
+  }, [])
 
-    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateRange[0]}&date_high=${dateRange[1]}`)
+  useEffect(() => {
+    fetch(`http://${config.server_host}:${config.server_port}/topAlbumsInRange?date_low=${dateLow}&date_high=${dateHigh}`)
     .then(res => res.json())
     .then(resJson => setTopData(resJson))
-  }, [])
+  }, [dateLow, dateHigh])
   const avgColumns = [
     // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
     //     // <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
@@ -52,6 +59,7 @@ export default function AlbumsPage() {
 
 
   return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
     <Container>
       <h2>General Album Statistics</h2>
       <DataGrid
@@ -65,14 +73,18 @@ export default function AlbumsPage() {
       />
       <Divider />
       <h2>Find Albums from the Top 100 All-Time Artists!</h2>
-      <Slider
-          value={dateRange}
-          min={'1900-01-01'}
-          max={'2020-12-31'}
-          step={0.025}
-          onChange={(e, newValue) => setDateRange(newValue)}
-          valueLabelDisplay='auto'
-        />
+      <DatePicker
+        label="Start Date"
+        value={dateLow}
+        onChange={(newValue) => setDateLow(newValue)}
+      />
+      <DatePicker
+        label="End Date"
+        value={dateHigh}
+        onChange={(newValue) => setDateHigh(newValue)}
+      />
+      <div>(Dates range from 1/1/1990 to 12/31/2020)</div>
+      <br />
       <DataGrid
         getRowId={(row) => row.album}
         rows={topData}
@@ -83,5 +95,6 @@ export default function AlbumsPage() {
         autoHeight
       />
     </Container>
+    </LocalizationProvider>
   )
 }
