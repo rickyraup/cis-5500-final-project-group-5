@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from '@mui/material'
 // CHANGE THEME COLORS
-import { indigo, amber } from '@mui/material/colors'
+import { indigo, blueGrey } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
 
 // ADD PAGE/COMPONENT IMPORTS HERE
@@ -15,8 +15,22 @@ import NavBar from './components/NavBar'
 // CHANGE THEME COLORS AND OTHER CUSTOMIZATIONS
 export const theme = createTheme({
   palette: {
-    primary: indigo,
-    secondary: amber,
+    primary: blueGrey,
+    secondary: indigo,
+  },
+  typography: {
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
   },
 })
 
