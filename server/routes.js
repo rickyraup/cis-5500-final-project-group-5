@@ -131,25 +131,23 @@ const search_songs_advanced = async function(req, res) {
   });
 }
 
-/**
-`
-  WITH artists_in_album AS (SELECT alb.artist AS Artist, alb.Metacritic_Critic_Score AS critic_score
-    FROM Album alb)
-  SELECT a.artist AS artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
-  FROM Artist a, artists_in_album b
-  WHERE UPPER(a.artist) = UPPER(b.Artist)
-  GROUP BY country 
-  `
- */
-
 const top_artist_by_country = async function(req, res) {
   connection.query(`
-  WITH artists_in_album AS (SELECT alb.artist AS Artist, alb.Metacritic_Critic_Score AS critic_score
-    FROM Album alb)
+  WITH artists_in_album AS (
+    SELECT alb.artist AS Artist, alb.Metacritic_Critic_Score AS critic_score
+    FROM Album alb
+    WHERE alb.Metacritic_Critic_Score IS NOT NULL
+  ),
+  max_artist AS (
+      SELECT artist, country, listeners
+      FROM Artist
+      WHERE artist = ANY (SELECT Artist FROM artists_in_album)
+  )
   SELECT a.artist AS artist, a.country, MAX(a.listeners) AS listeners, b.critic_score
-  FROM Artist a, artists_in_album b
-  WHERE UPPER(a.artist) = UPPER(b.Artist)
-  GROUP BY country 
+  FROM max_artist a, artists_in_album b
+  WHERE UPPER(b.Artist) = UPPER(a.artist)
+  GROUP BY country
+  ORDER BY listeners DESC;
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
@@ -217,23 +215,23 @@ const average_rating_artist = async function(req, res) {
 const average_albums = async function(req, res) {
   connection.query(`
   WITH meta AS (
-    SELECT DISTINCT Title, Artist, Metacritic_Critic_Score AS
+    SELECT Title, Artist, Metacritic_Critic_Score AS
         critic_score, Metacritic_User_Score AS user_score
     FROM Album
   ),
   critic_reviews AS (
-    SELECT DISTINCT Title, Artist, AVG(Rating) as review_scores
+    SELECT Title, Artist, AVG(Rating) as review_scores
     FROM Review
     GROUP BY Artist, Title
   ),
   albums AS (
-    SELECT DISTINCT album, artist,
+    SELECT album, artist,
         AVG(danceability) AS danceability, AVG(energy) AS energy,
         AVG(loudness) AS loudness, AVG(speechiness) AS speechiness,
         AVG(acousticness) AS acousticness, AVG(instrumentalness) AS instrumentalness,
         AVG(liveness) AS liveness, AVG(valence) AS valence,
         AVG(tempo) AS tempo, SUM(duration_ms) / 60000 AS duration_min, release_date
-    FROM Song
+    FROM SongAlbum
     GROUP BY album
   )
   SELECT m.Title, m.Artist, m.critic_score, m.user_score,
@@ -242,8 +240,8 @@ const average_albums = async function(req, res) {
       a.liveness, a.valence, a.tempo, a.duration_min, a.release_date
   FROM meta m JOIN critic_reviews cr ON m.Title = cr.Title
   JOIN albums a ON m.Title = a.album
-  GROUP BY Title, Artist
-  ORDER BY m.critic_score DESC
+  GROUP BY m.Title, m.Artist
+  ORDER BY m.critic_score DESC;
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
@@ -263,23 +261,19 @@ const top_albums_in_range = async function(req, res) {
     FROM Artist
     ORDER BY listeners DESC
     LIMIT 100
-  ),
-  top_albums AS (
-      SELECT DISTINCT album, Song.artist,
-          AVG(danceability) AS danceability, AVG(energy) AS energy,
-          AVG(loudness) AS loudness, AVG(speechiness) AS speechiness,
-          AVG(acousticness) AS acousticness, AVG(instrumentalness) AS instrumentalness,
-          AVG(liveness) AS liveness, AVG(valence) AS valence,
-          AVG(tempo) AS tempo,  SUM(duration_ms) / 6000 AS duration_min, release_date
-      FROM Song JOIN top_100 ON Song.artist = top_100.artist
-      WHERE release_date IS NOT NULL AND
-          release_date <> 0000 AND
-          release_date >= '${dateLow}' AND
-          release_date <= '${dateHigh}'
-      GROUP BY album
+),
+top_albums AS (
+    SELECT album, SongAlbum.artist,
+        AVG(danceability) AS danceability, SUM(duration_ms) / 6000 AS duration_min, release_date
+    FROM SongAlbum JOIN top_100 ON SongAlbum.artist = top_100.artist
+    WHERE release_date IS NOT NULL AND
+        release_date <> 0000 AND
+        release_date >= '${dateLow}' AND
+        release_date <= '${dateHigh}'
+    GROUP BY album
   ),
   meta AS (
-      SELECT DISTINCT Title, Artist, Metacritic_Critic_Score AS critic_score,
+      SELECT Title, Artist, Metacritic_Critic_Score AS critic_score,
           Metacritic_Reviews AS critic_reviews, Metacritic_User_Score AS user_score,
           Metacritic_User_Reviews AS user_reviews
       FROM Album
@@ -291,8 +285,7 @@ const top_albums_in_range = async function(req, res) {
   FROM top_100 t100 JOIN top_albums ta
       ON ta.artist = t100.artist
       JOIN meta m ON t100.artist = m.Artist
-  GROUP BY t100.artist, t100.country
-  ORDER BY t100.listeners DESC
+  GROUP BY ta.album, t100.artist
     `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
@@ -305,45 +298,34 @@ const top_albums_in_range = async function(req, res) {
 
 const highest_rated_albums_per_artist = async function(req, res) {
   connection.query(`
-  WITH avg_ratings AS (
-    SELECT Artist, Title, AVG(Rating) AS avg_rating
-    FROM Review
-    GROUP BY Artist, Title
-  ),
-  album_mc_scores AS (
-      SELECT Title, Metacritic_User_Score
-      FROM Album
-      WHERE Metacritic_User_Score IS NOT NULL
+  WITH album_mc_scores AS (
+    SELECT Title, Metacritic_User_Score
+    FROM Album
+    WHERE Metacritic_User_Score IS NOT NULL
   ),
   max_album AS (
       SELECT a.Artist, a.Title, MAX(a.avg_rating) AS avg_rating
-      FROM avg_ratings a
+      FROM (
+          SELECT Artist, Title, AVG(Rating) AS avg_rating
+          FROM Review
+          GROUP BY Artist, Title
+      ) a
       GROUP BY a.Artist
   ),
-  qualities AS (
-      SELECT album, AVG(danceability) AS avg_dance, AVG(energy) AS avg_energy,
-          AVG(loudness) AS avg_loudness, AVG(speechiness) AS avg_speechiness,
-          AVG(acousticness) AS avg_acousticness, AVG(instrumentalness) AS avg_instrumentalness,
-          AVG(liveness) AS avg_liveness, AVG(valence) AS avg_valence,
-          AVG(tempo) AS avg_tempo, SUM(duration_ms) / 6000 AS duration_min, release_date
-      FROM Song
-      GROUP BY album
-  ),
   qualities_rating AS (
-      SELECT a.Artist AS artist, a.Title AS album, b.avg_dance as avg_dance,
-            b.avg_energy AS avg_energy, b.avg_loudness AS avg_loudness,
-            b.avg_speechiness AS avg_speechiness, b.avg_acousticness AS avg_acousticness,
-            b.avg_instrumentalness AS avg_instrumentalness, b.avg_liveness AS avg_liveness,
-            b.avg_valence AS avg_valence, b.avg_tempo AS avg_tempo, b.duration_min AS duration,
-            b.release_date AS release_date, a.avg_rating AS avg_rating
-      FROM max_album a JOIN qualities b
+      SELECT a.Artist AS artist, a.Title AS album, b.avg_dance as avg_dance, a.avg_rating AS avg_rating
+      FROM max_album a JOIN (
+          SELECT album, AVG(danceability) AS avg_dance
+          FROM SongAlbum
+          GROUP BY album
+      ) b
           ON a.Title = b.album
       GROUP BY a.Title
   )
   SELECT a.artist AS artist, a.album AS album, a.avg_dance AS avg_dance, a.avg_rating AS avg_rating, b.Metacritic_User_Score AS Metacritic_User_Score
   FROM qualities_rating a JOIN album_mc_scores b
       ON a.album = b.Title
-  ORDER BY avg_dance, avg_rating, Metacritic_User_Score;
+  ORDER BY avg_dance, avg_rating, Metacritic_User_Score
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
