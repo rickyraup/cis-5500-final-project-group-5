@@ -1,9 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Card, Container } from '@mui/material';
-import { NavLink } from 'react-router-dom';
+import {Container } from '@mui/material';
 
-const config = require('../config.json');
-
+//renders home page
 export default function MainPage() {
   return (
     <Container>

@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Button, Switch, Checkbox, Container, FormControl, FormControlLabel, Grid, Link, Slider, TextField, InputLabel, Select, MenuItem } from '@mui/material';
-import { DataGrid, heIL } from '@mui/x-data-grid';
+import { Button, Switch, Container, FormControl, FormControlLabel, Grid, Slider, TextField, InputLabel, Select, MenuItem } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { formatDuration } from '../helpers/formatter';
-// import SongCard from '../components/SongCard';
-// import * from 
-// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
-import dayjs from 'dayjs';
+
 const config = require('../config.json');
 
 export default function SearchPage() {
+
+  // define all variables for page
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
-  // const [selectedSongId, setSelectedSongId] = useState(null);
-
   const [name, setName] = useState('');
   const [dance, setDance] = useState([0, 1]);
   const [energy, setEnergy] = useState([0, 1]);
@@ -24,16 +21,18 @@ export default function SearchPage() {
   const [valence, setValence] = useState([0, 1]);
   const [tempo, setTempo] = useState([0, 250]);
   const [duration, setDuration] = useState([0, 6100000]);
-  // const [date, setDate] = useState([dayjs('1900-01-01').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')]);
-
 
   // 0=song, 1=artist, 2=album
   const [searchType, setSearchType] = useState(0);
   const [searchAdvanced, setSearchAdvanced] = useState(false);
 
+  //hooks for each component on search page
+  //hook for rendering components that display search results of searching for song, artist, or album
   useEffect(() => {
     setName('');
     setSearchAdvanced(false);
+
+    //routes to url for searching for songs (default state)
     if (searchType === 0) {
       fetch(`http://${config.server_host}:${config.server_port}/searchSongs`)
       .then(res => res.json())
@@ -41,6 +40,8 @@ export default function SearchPage() {
         const songsWithId = resJson.map((song) => ({ id: song.id, ...song }));
         setData(songsWithId);
       });
+    
+    //routes to url for searching for artists (default state)
     } else if (searchType === 1) {
       fetch(`http://${config.server_host}:${config.server_port}/searchArtists`)
       .then(res => res.json())
@@ -48,6 +49,8 @@ export default function SearchPage() {
         const artistsWithId = resJson.map((artist) => ({ id: artist.artist, ...artist }));
         setData(artistsWithId);
       });
+    
+    //routes to url for searching for albums (default state)
     } else {
       fetch(`http://${config.server_host}:${config.server_port}/searchAlbums`)
       .then(res => res.json())
@@ -58,7 +61,9 @@ export default function SearchPage() {
     }
   }, [searchType]);
 
+
   const search = () => {
+    //routes to url for searching for songs with specific input WITHOUT advanced search
     if (searchType === 0 && !searchAdvanced) {
       fetch(`http://${config.server_host}:${config.server_port}/searchSongs?name=${name}`)
       .then(res => res.json())
@@ -66,6 +71,8 @@ export default function SearchPage() {
         const songsWithId = resJson.map((song) => ({ id: song.id, ...song }));
         setData(songsWithId);
       });
+
+    //routes to url for searching for songs with specific input WITH advanced search inputs
     } else if (searchType === 0 && searchAdvanced) {
       fetch(`http://${config.server_host}:${config.server_port}/searchSongsAdvanced?name=${name}` +
         `&dance_low=${dance[0]}&dance_high=${dance[1]}` +
@@ -84,6 +91,8 @@ export default function SearchPage() {
         const artistsWithId = resJson.map((artist) => ({ id: artist.artist, ...artist }));
         setData(artistsWithId);
       });
+    
+    //routes to url for searching for artists with specific input 
     } else if (searchType === 1) {
       fetch(`http://${config.server_host}:${config.server_port}/searchArtists?name=${name}`)
       .then(res => res.json())
@@ -91,6 +100,8 @@ export default function SearchPage() {
         const artistsWithId = resJson.map((artist) => ({ id: artist.artist, ...artist }));
         setData(artistsWithId);
       });
+    
+    //routes to url for searching for albums with specific input
     } else {
       fetch(`http://${config.server_host}:${config.server_port}/searchAlbums?name=${name}`)
       .then(res => res.json())
@@ -101,11 +112,9 @@ export default function SearchPage() {
     }
   }
 
+  //column definitions for each component
+  //columns for song search results
   const songColumns = [
-    // { field: 'name', headerName: 'Name', width: 200, renderCell: (params) => (
-    //      <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    //  ) },
-    { field: 'name', headerName: 'Name', width: 200},
     { field: 'name', headerName: 'Name', width: 200},
     { field: 'artist', headerName: 'Artists', width: 400},
     { field: 'album', headerName: 'Album' , width: 300},
@@ -113,37 +122,31 @@ export default function SearchPage() {
     { field: 'release_date', headerName: 'Release Date', width: 130},
   ]
 
+  //columns for artist search results
   const artistColumns = [
-    // { field: 'artist', headerName: 'Artist', width: 300, renderCell: (params) => (
-    //      <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    //  ) },
-    { field: 'artist', headerName: 'Artist', width: 300},
     { field: 'artist', headerName: 'Artist', width: 300},
     { field: 'country', headerName: 'Country', width: 150},
     { field: 'tags', headerName: 'Genres' , width: 600},
     { field: 'listeners', headerName: 'Listeners' }
   ]
 
+  //columns for album search results
   const albumColumns = [
-    // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
-    //    <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-    //  ) },
-    { field: 'Title', headerName: 'Title', width: 400},
     { field: 'Title', headerName: 'Title', width: 400},
     { field: 'Artist', headerName: 'Artist', width: 400},
     { field: 'Release_Year', headerName: 'Year' , width: 100},
     { field: 'Genre', headerName: 'Genre', width: 200}
   ]
-  // This defines the columns of the table of songs used by the DataGrid component.
-  // The format of the columns array and the DataGrid component itself is very similar to our
-  // LazyTable component. The big difference is we provide all data to the DataGrid component
-  // instead of loading only the data we need (which is necessary in order to be able to sort by column)
+
+  //returns desired columns based on drop down selection (song, artist, album)
   const columns = columnType => {
     if (columnType === 0) return songColumns;
     else if (columnType === 1) return artistColumns;
     else return albumColumns;
   }
 
+  /*creates dropdown menu component that allows user to pick between searching for songs, 
+  artists, or albums */
   const SearchTypeSelector = () => (
     <FormControl fullWidth>
       <InputLabel id="search-type-select-label">Type</InputLabel>
@@ -154,6 +157,7 @@ export default function SearchPage() {
         label="Type"
         onChange={e => setSearchType(e.target.value)}
       >
+        {/* assigns song to value 0, artist to value 1, album to value 2 */}
         <MenuItem value={0}>Song</MenuItem>
         <MenuItem value={1}>Artist</MenuItem>
         <MenuItem value={2}>Album</MenuItem>
@@ -161,8 +165,11 @@ export default function SearchPage() {
     </FormControl>
   )
 
+  /*creates dropdown menu component that allows user to perform advanced song search
+  with multiple inputs including danceability, energy, loudness, etc. */
   const AdvancedOptions = (
     <>
+      {/* slider for danceability */}
       <Grid item xs={4}>
         <p>Danceability</p>
         <Slider
@@ -174,6 +181,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for energy */}
       <Grid item xs={4}>
         <p>Energy</p>
         <Slider
@@ -185,6 +194,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for loudness */}
       <Grid item xs={4}>
         <p>Loudness</p>
         <Slider
@@ -196,6 +207,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for speechiness */}
       <Grid item xs={4}>
         <p>Speechiness</p>
         <Slider
@@ -207,6 +220,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for acousticness */}
       <Grid item xs={4}>
         <p>Acousticness</p>
         <Slider
@@ -218,6 +233,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for instrumentalness */}
       <Grid item xs={4}>
         <p>Instrumentalness</p>
         <Slider
@@ -229,6 +246,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for liveness */}
       <Grid item xs={4}>
         <p>Liveness</p>
         <Slider
@@ -240,6 +259,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for valence */}
       <Grid item xs={4}>
         <p>Valence</p>
         <Slider
@@ -251,6 +272,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for tempo */}
       <Grid item xs={4}>
         <p>Tempo</p>
         <Slider
@@ -262,6 +285,8 @@ export default function SearchPage() {
           valueLabelDisplay='auto'
         />
       </Grid>
+
+      {/* slider for duration */}
       <Grid item xs={4}>
         <p>Duration</p>
         <Slider
@@ -277,24 +302,23 @@ export default function SearchPage() {
     </>
   )
 
-  // This component makes uses of the Grid component from MUI (https://mui.com/material-ui/react-grid/).
-  // The Grid component is super simple way to create a page layout. Simply make a <Grid container> tag
-  // (optionally has spacing prop that specifies the distance between grid items). Then, enclose whatever
-  // component you want in a <Grid item xs={}> tag where xs is a number between 1 and 12. Each row of the
-  // grid is 12 units wide and the xs attribute specifies how many units the grid item is. So if you want
-  // two grid items of the same size on the same row, define two grid items with xs={6}. The Grid container
-  // will automatically lay out all the grid items into rows based on their xs values.
+  // renders page fully with all components put together
   return (
     <Container>
-      {/* {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />} */}
       <h2>Search!</h2>
       <Grid container spacing={6}>
+
+        {/* renders search bar */}
         <Grid item xs={7}>
           <TextField label='Name' value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}/>
         </Grid>
+
+        {/* renders dropdown menu */}
         <Grid item xs={3}>
           <SearchTypeSelector />
         </Grid>
+
+        {/* renders switch for advanced song search option */}
         {searchType === 0 && 
           <Grid item xs={2}>
             <FormControlLabel 
@@ -307,9 +331,13 @@ export default function SearchPage() {
         }
         {searchAdvanced && AdvancedOptions}
       </Grid>
+
+      {/* renders search button */}
       <Button onClick={() => search() } style={{ left: '50%', transform: 'translateX(-50%)' }}>
         Search
       </Button>
+
+      {/* renders table with results of search */}
       <h2>Results</h2>
       <DataGrid
         getRowId={(row) => (Math.random() * 100)}

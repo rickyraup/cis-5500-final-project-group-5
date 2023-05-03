@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CssBaseline, ThemeProvider } from '@mui/material'
-// CHANGE THEME COLORS
+// change theme colors
 import { indigo, blueGrey } from '@mui/material/colors'
 import { createTheme } from "@mui/material/styles";
 
-// ADD PAGE/COMPONENT IMPORTS HERE
+// imports for each page 
 import MainPage from './pages/MainPage'
 import AlbumsPage from './pages/AlbumsPage'
 import ArtistsPage from './pages/ArtistsPage'
@@ -12,7 +12,7 @@ import SearchPage from './pages/SearchPage'
 import CountriesPage from './pages/CountriesPage'
 import NavBar from './components/NavBar'
 
-// CHANGE THEME COLORS AND OTHER CUSTOMIZATIONS
+// change theme colors and other customizations
 export const theme = createTheme({
   palette: {
     primary: blueGrey,
@@ -34,6 +34,7 @@ export const theme = createTheme({
   },
 })
 
+// Route for each page on website
 export default function App() {
   return (
     <ThemeProvider theme={theme}>

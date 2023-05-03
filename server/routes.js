@@ -1,6 +1,7 @@
 const mysql = require('mysql')
 const config = require('./config.json')
 
+// start connection to database
 const connection = mysql.createConnection({
   host: config.rds_host,
   user: config.rds_user,
@@ -11,7 +12,10 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => err && console.log(err));
 
-
+/* Given a user input, search for all artists with the input as a substring of their name.
+Request params: name (string)
+Response params: artist (string), country (string), tags (string), listeners (string)
+*/
 const search_artists = async function(req, res) {
   const name = req.query.name ?? '';
 
@@ -30,6 +34,10 @@ const search_artists = async function(req, res) {
   });
 }
 
+/* Given a user input, search for all albums with the input as a substring of their name.
+Request params: name (string)
+Response params: title (string), artist (string), year (string), genre (string)
+*/
 const search_albums = async function(req, res) {
   const name = req.query.name ?? '';
 
@@ -48,6 +56,10 @@ const search_albums = async function(req, res) {
   });
 }
 
+/* Given a user input, search for all songs with the input as a substring of their name.
+Request params: name (string)
+Response params: name (string), artists (string), album (string), length (int), release_date (string)
+*/
 const search_songs = async function(req, res) {
   const name = req.query.name ?? '';
 
@@ -69,6 +81,10 @@ const search_songs = async function(req, res) {
   }); 
 }
 
+/* Output the number of artists of each country
+Request params: None
+Response params: country (string), num_artists (string)
+*/
 const num_artists_by_country = async function(req, res) {
 
   connection.query(`
@@ -86,6 +102,13 @@ const num_artists_by_country = async function(req, res) {
   });
 }
 
+/* Given several user inputs, search for all songs that satisfy the desired parameters
+Request params: name (string), danceLow (float), danceHigh (float), energyLow (float), energyHigh (float), loudLow (float),
+loudHigh (float), speechLow (float), speechHigh (float), acousticLow (float), acousticHigh (float), instrumentLow (float),
+instrumentHigh (float), liveLow (float), liveHigh (float), valenceLow (float), valenceHigh (float), tempoLow (integer),
+tempoHigh (integer), durationLow (integer), durationHigh (integer)
+Response params: name (string), artists (string), album (string), length (int), release_date (string)
+*/
 const search_songs_advanced = async function(req, res) {
   const name = req.query.name ?? '';
   const danceLow = req.query.dance_low ?? 0;
@@ -134,6 +157,10 @@ const search_songs_advanced = async function(req, res) {
   });
 }
 
+/* Output the top artists from each country, along with their number of listeners, albums, and critic scores
+Request params: None
+Response params: country(string), artist(string), tag (string), listeners (integer), album (string), critic_score (integer)
+*/
 const top_artist_by_country = async function(req, res) {
   connection.query(`
   WITH artists_in_album AS (
@@ -161,6 +188,11 @@ const top_artist_by_country = async function(req, res) {
   }); 
 }
 
+/* Given a chosen album score threshold, return the name of all artists and the number of titles they have 
+rated greater than the threshold
+Request params: threshold(float)
+Response params: artist(string), count(float)
+*/
 const rating_threshold_count = async function(req, res) {
   const threshold = req.query.threshold ?? 0;
 
@@ -180,6 +212,10 @@ const rating_threshold_count = async function(req, res) {
   }); 
 }
 
+/* Output all artists' average album rating
+Request params: None
+Response params: artist (string), AvgRating (float)
+*/
 const average_rating_artist_all = async function(req, res) {
   connection.query(`
   SELECT Artist, AVG(Rating) AS AvgRating
@@ -196,6 +232,10 @@ const average_rating_artist_all = async function(req, res) {
   }); 
 }
 
+/* Given a user input artist name, output the artist’s average album rating
+Request params: artist(string)
+Response params: artist (string), rating(float)
+*/
 const average_rating_artist = async function(req, res) {
   const artist = req.params.artist ?? ''
   connection.query(`
@@ -214,6 +254,12 @@ const average_rating_artist = async function(req, res) {
   }); 
 }
 
+/* For all albums, get their average review scores and average statistics across all songs
+Request params: None
+Response params: title(string), artist(string), criticScore(float), userScore(float), reviewScore(float), releaseDate(float), 
+dance (float), energy (float), loud (float), speech (float), acoustic (float), instrument (float), live (float), valence (float),
+tempo (integer), duration (integer)
+*/
 const average_albums = async function(req, res) {
   connection.query(`
   WITH meta AS (
@@ -254,6 +300,11 @@ const average_albums = async function(req, res) {
   }); 
 }
 
+/* Output albums made by artists in the top 100 all-time artists that were released within the dates as input by user
+Request params: dateLow (date)dateHigh (date)
+Response params:artist (string), country (string), tags (string), listeners (int), album (string), danceability (float), 
+duration_min (int), release_date (date), critic_score (int), critic_reviews(int), user_score(int), user_reviews(int)
+*/ 
 const top_albums_in_range = async function(req, res) {
   const dateLow = req.query.date_low ?? '1900-01-01'
   const dateHigh = req.query.date_high ?? '2020-12-31'
@@ -298,6 +349,10 @@ top_albums AS (
   });
 }
 
+/* Output the highest rated album for each artist along with its Metacritic User score and average danceability.
+Request params: None
+Response params: album (string), danceability (float), rating (int), user_score (int)
+*/
 const highest_rated_albums_per_artist = async function(req, res) {
   connection.query(`
   WITH album_mc_scores AS (
@@ -338,6 +393,10 @@ const highest_rated_albums_per_artist = async function(req, res) {
   }); 
 }
 
+/* Given a user input country, output that country’s average album rating
+Request params: None
+Response params: averageScore (float)
+*/
 const average_country_rating = async function(req, res) {
   connection.query(`
     SELECT country, AVG(Rating) AS avgRating
@@ -354,6 +413,10 @@ const average_country_rating = async function(req, res) {
   }); 
 }
 
+/* Given a user input genre, output that genre’s average album rating
+Request params: genre (string)
+Response params: Title (string), Artists (string), Avg_Rating (float), Listeners (string)
+*/
 const top_recent_albums_genre = async function(req, res) {
   const genre = req.query.genre ?? ''
   connection.query(`
@@ -381,12 +444,12 @@ const top_recent_albums_genre = async function(req, res) {
       console.log(err);
       res.json([]);
     } else {
-      console.log(data)
       res.json(data);
     }
   }); 
 }
 
+// export routes
 module.exports = {
   search_artists,
   search_albums,

@@ -37,6 +37,7 @@ const NavText = ({ href, text, isMain }) => {
   )
 }
 
+// export navigation bar with menu options
 export default function NavBar() {
   return (
     <AppBar position='static'>
