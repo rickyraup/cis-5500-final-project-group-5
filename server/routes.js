@@ -110,8 +110,11 @@ const search_songs_advanced = async function(req, res) {
   const durationHigh = req.query.duration_high = 6100000;
 
   connection.query(`
+    WITH s AS (
+      SELECT * FROM Song LIMIT 100000
+    )
     SELECT *
-    FROM Song
+    FROM s
     WHERE name LIKE '%${name}%'
       AND danceability BETWEEN ${danceLow} AND ${danceHigh}
       AND energy BETWEEN ${energyLow} AND ${energyHigh}
