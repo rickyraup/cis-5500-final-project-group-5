@@ -23,6 +23,7 @@ app.get('/averageAlbums', routes.average_albums)//Covered
 app.get('/topAlbumsInRange', routes.top_albums_in_range)//Covered
 app.get('/highestRatedAlbumsPerArtist', routes.highest_rated_albums_per_artist) //Covered
 app.get('/averageCountryRating', routes.average_country_rating) //Covered
+app.get('/topRecentAlbumsGenre', routes.top_recent_albums_genre)
 
 
 app.listen(config.server_port, () => {

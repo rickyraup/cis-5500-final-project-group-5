@@ -352,6 +352,37 @@ const average_country_rating = async function(req, res) {
   }); 
 }
 
+const top_recent_albums_genre = async function(req, res) {
+  const genre = req.query.genre ?? ''
+  connection.query(`
+  WITH max_album AS (
+      SELECT a.Artist, a.Title, MAX(a.avg_rating) AS avg_rating
+      FROM (
+          SELECT Artist, Title, AVG(Rating)AS avg_rating
+          FROM Review
+          GROUP BY Artist, Title
+      ) a
+      GROUP BY a.Artist
+   ),
+   alb AS (
+     SELECT a.Artist, a.Title, a.Genre, a.Release_Year, avg_rating
+     FROM Album a JOIN max_album ON a.Title = max_album.Title
+   )
+   SELECT alb.Title, alb.Artist, avg_rating
+   FROM alb JOIN Artist ON alb.Artist = Artist.artist
+   WHERE Release_Year >= 2000 AND Genre LIKE '%${genre}%'
+   ORDER BY listeners DESC, avg_rating DESC
+   LIMIT 10;
+  `, (err, data) => {
+    if (err || data.length === 0) {
+      console.log(err);
+      res.json([]);
+    } else {
+      res.json(data);
+    }
+  }); 
+}
+
 module.exports = {
   search_artists,
   search_albums,
@@ -365,5 +396,6 @@ module.exports = {
   average_albums,
   top_albums_in_range,
   highest_rated_albums_per_artist,
-  average_country_rating
+  average_country_rating,
+  top_recent_albums_genre
 }

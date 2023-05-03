@@ -12,8 +12,10 @@ export default function AlbumsPage() {
   const [pageSize, setPageSize] = useState(10)
   const [dateLow, setDateLow] = useState(dayjs('01-01-1990'))
   const [dateHigh, setDateHigh] = useState(dayjs('12-31-2020'))
+  const [genreType, setGenreType] = useState('')
   const [avgData, setAvgData] = useState([])
   const [topData, setTopData] = useState([])
+  const [genreData, setGenreData] = useState([])
 
   useEffect(() => {
     fetch(`http://${config.server_host}:${config.server_port}/averageAlbums`)
@@ -27,6 +29,17 @@ export default function AlbumsPage() {
     .then(resJson => setTopData(resJson))
   }, [dateLow, dateHigh])
 
+  useEffect(() => {
+    fetch(`http://${config.server_host}:${config.server_port}/topRecentAlbumsGenre`)
+    .then(res => res.json())
+    .then(resJson => setGenreData(resJson))
+  }, [])
+
+  const searchGenre = () => {
+    fetch(`http://${config.server_host}:${config.server_port}/topRecentAlbumsGenre?genre=${genreType}`)
+    .then(res => res.json())
+    .then(resJson => setGenreData(resJson))
+  }
   
   const avgColumns = [
     // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
@@ -57,6 +70,15 @@ export default function AlbumsPage() {
     { field: 'critic_reviews', headerName: 'Critic Reviews', width: 120},
     { field: 'user_score', headerName: 'User Score', width: 100},
     { field: 'user_reviews', headerName: 'User Reviews', width: 100},
+  ]
+
+  const genreColumns = [
+    // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
+    //     // <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    // ) },
+    { field: 'Title', headerName: 'Title', width: 400},
+    { field: 'Artist', headerName: 'Artist', width: 400},
+    { field: 'avg_rating', headerName: 'Average Rating' , width: 300},
   ]
 
   
@@ -93,6 +115,23 @@ export default function AlbumsPage() {
         getRowId={(row) => row.album}
         rows={topData}
         columns={topColumns}
+        pageSize={pageSize}
+        rowsPerPageOptions={[5, 10, 25]}
+        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+        autoHeight
+      />
+      <Divider />
+      <h2>Find the Top Albums of the 21st Century by Genre!</h2>
+      <TextField id="outlined-basic" label="Genre" variant="outlined" value={genreType} onChange={e => setGenreType(e.target.value)}/>
+      <br />
+      <Button onClick={()=>searchGenre()}>
+         Search
+      </Button>
+      <br />
+      <DataGrid
+        getRowId={(row) => row.Title}
+        rows={genreData}
+        columns={genreColumns}
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}

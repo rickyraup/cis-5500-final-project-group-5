@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Switch, Checkbox, Container, FormControl, FormControlLabel, Grid, Link, Slider, TextField, InputLabel, Select, MenuItem } from '@mui/material';
 import { DataGrid, heIL } from '@mui/x-data-grid';
 import { formatDuration } from '../helpers/formatter';
-import SongCard from '../components/SongCard';
+// import SongCard from '../components/SongCard';
 // import * from 
 // import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import dayjs from 'dayjs';
@@ -11,7 +11,7 @@ const config = require('../config.json');
 export default function SearchPage() {
   const [pageSize, setPageSize] = useState(10);
   const [data, setData] = useState([]);
-  const [selectedSongId, setSelectedSongId] = useState(null);
+  // const [selectedSongId, setSelectedSongId] = useState(null);
 
   const [name, setName] = useState('');
   const [dance, setDance] = useState([0, 1]);
@@ -102,9 +102,10 @@ export default function SearchPage() {
   }
 
   const songColumns = [
-    { field: 'name', headerName: 'Name', width: 200, renderCell: (params) => (
-         <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-     ) },
+    // { field: 'name', headerName: 'Name', width: 200, renderCell: (params) => (
+    //      <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    //  ) },
+    { field: 'name', headerName: 'Name', width: 200},
     { field: 'name', headerName: 'Name', width: 200},
     { field: 'artist', headerName: 'Artists', width: 400},
     { field: 'album', headerName: 'Album' , width: 300},
@@ -113,9 +114,10 @@ export default function SearchPage() {
   ]
 
   const artistColumns = [
-    { field: 'artist', headerName: 'Artist', width: 300, renderCell: (params) => (
-         <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-     ) },
+    // { field: 'artist', headerName: 'Artist', width: 300, renderCell: (params) => (
+    //      <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    //  ) },
+    { field: 'artist', headerName: 'Artist', width: 300},
     { field: 'artist', headerName: 'Artist', width: 300},
     { field: 'country', headerName: 'Country', width: 150},
     { field: 'tags', headerName: 'Genres' , width: 600},
@@ -123,9 +125,10 @@ export default function SearchPage() {
   ]
 
   const albumColumns = [
-    { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
-       <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
-     ) },
+    // { field: 'Title', headerName: 'Title', width: 400, renderCell: (params) => (
+    //    <Link onClick={() => setSelectedSongId(params.row.artist)}>{params.value}</Link>
+    //  ) },
+    { field: 'Title', headerName: 'Title', width: 400},
     { field: 'Title', headerName: 'Title', width: 400},
     { field: 'Artist', headerName: 'Artist', width: 400},
     { field: 'Release_Year', headerName: 'Year' , width: 100},
@@ -283,7 +286,7 @@ export default function SearchPage() {
   // will automatically lay out all the grid items into rows based on their xs values.
   return (
     <Container>
-      {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />}
+      {/* {selectedSongId && <SongCard songId={selectedSongId} handleClose={() => setSelectedSongId(null)} />} */}
       <h2>Search!</h2>
       <Grid container spacing={6}>
         <Grid item xs={7}>
