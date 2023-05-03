@@ -52,10 +52,13 @@ const search_songs = async function(req, res) {
   const name = req.query.name ?? '';
 
   connection.query(`
+    WITH s AS (
+      SELECT * FROM Song LIMIT 100000
+    )
     SELECT *
-      FROM Song
-      WHERE name LIKE '%${name}%' 
-      ORDER BY name ASC
+    FROM s
+    WHERE name LIKE '%${name}%' 
+    ORDER BY name ASC
     `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
@@ -153,7 +156,6 @@ const top_artist_by_country = async function(req, res) {
       console.log(err);
       res.json([]);
     } else {
-      console.log(data);
       res.json(data);
     }
   }); 
@@ -356,28 +358,30 @@ const top_recent_albums_genre = async function(req, res) {
   const genre = req.query.genre ?? ''
   connection.query(`
   WITH max_album AS (
-      SELECT a.Artist, a.Title, MAX(a.avg_rating) AS avg_rating
-      FROM (
-          SELECT Artist, Title, AVG(Rating)AS avg_rating
-          FROM Review
-          GROUP BY Artist, Title
-      ) a
-      GROUP BY a.Artist
-   ),
-   alb AS (
-     SELECT a.Artist, a.Title, a.Genre, a.Release_Year, avg_rating
-     FROM Album a JOIN max_album ON a.Title = max_album.Title
-   )
-   SELECT alb.Title, alb.Artist, avg_rating
-   FROM alb JOIN Artist ON alb.Artist = Artist.artist
-   WHERE Release_Year >= 2000 AND Genre LIKE '%${genre}%'
-   ORDER BY listeners DESC, avg_rating DESC
-   LIMIT 10;
+    SELECT a.Artist, a.Title, MAX(a.avg_rating) AS avg_rating
+    FROM (
+        SELECT Artist, Title, AVG(Rating)AS avg_rating
+        FROM Review
+        GROUP BY Artist, Title
+    ) a
+    GROUP BY a.Artist
+    ),
+    alb AS (
+      SELECT a.Artist, a.Title, a.Genre, a.Release_Year, avg_rating
+      FROM Album a JOIN max_album ON a.Title = max_album.Title
+    )
+    SELECT alb.Title, alb.Artist, avg_rating
+    FROM alb JOIN Artist ON alb.Artist = Artist.artist
+    WHERE Release_Year >= 2000 AND Genre LIKE '%${genre}%'
+    GROUP BY alb.Title, alb.Artist, listeners
+    ORDER BY listeners DESC, avg_rating DESC
+    LIMIT 10;
   `, (err, data) => {
     if (err || data.length === 0) {
       console.log(err);
       res.json([]);
     } else {
+      console.log(data)
       res.json(data);
     }
   }); 
