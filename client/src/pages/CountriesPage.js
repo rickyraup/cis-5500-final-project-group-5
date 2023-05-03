@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Switch, Checkbox, Container, FormControl, FormControlLabel, Grid, Link, Slider, TextField, InputLabel, Select, MenuItem } from '@mui/material';
-import { DataGrid, heIL } from '@mui/x-data-grid';
-import { formatDuration } from '../helpers/formatter';
+import { Container, FormControl, Grid, InputLabel, Select, MenuItem } from '@mui/material';
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from 'react-simple-maps'
 import { Tooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
