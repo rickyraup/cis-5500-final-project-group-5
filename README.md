@@ -1,6 +1,7 @@
 # CIS 5500 Final Project (Group 5)
 ## Overview
 Members: Samuel Lee, Dhatri Medarametla, Allison Zhang, Kevin Zhou
+
 This project was developed in Spring 2023 for CIS-5500 at the University of Pennsylvania. 
 
 DataTune is a web application which aims to address this by providing users with new ways to discover music. Whether it be by artist ranking, song statistics, or album reviews, users can search for music in a global context. Specific attributes of music measured can be broken down by artist, album, and song. Learn about an artist's country of origin and number of listeners. Discover albums based on user reviews, critic reviews, and reception. Filter for songs based on danceability, year of release, liveliness, and more. All methods of search are made available through an interactive web page.
